@@ -29,28 +29,44 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "F:/goland/go_project/21weeks_go"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;F:/goland/go_project/21weeks_go&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="Go 构建.go build 01.go (1)">
-    <configuration name="go build 01.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+}</component>
+  <component name="RunManager" selected="Go 构建.go build 03.go">
+    <configuration name="go build 01.go (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="21weeks_go" />
       <working_directory value="$PROJECT_DIR$/.." />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/28_func/01.go" />
+      <filePath value="$PROJECT_DIR$/26_pointer/01.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build 01.go (3)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="21weeks_go" />
+      <working_directory value="$PROJECT_DIR$/.." />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/33_homework/01.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build 02.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="21weeks_go" />
+      <working_directory value="$PROJECT_DIR$/.." />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/33_homework/02.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build 02.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -58,7 +74,7 @@
       <working_directory value="$PROJECT_DIR$/.." />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/27_map/02.go" />
+      <filePath value="$PROJECT_DIR$/31_silce/02.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build 03.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -66,31 +82,15 @@
       <working_directory value="$PROJECT_DIR$/.." />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/27_map/03.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build test.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="21weeks_go" />
-      <working_directory value="$PROJECT_DIR$/.." />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/27_map/test.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build work1.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="21weeks_go" />
-      <working_directory value="$PROJECT_DIR$/.." />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/27_map/work1.go" />
+      <filePath value="$PROJECT_DIR$/33_homework/03.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 构建.go build 01.go (1)" />
-        <item itemvalue="Go 构建.go build work1.go" />
-        <item itemvalue="Go 构建.go build test.go" />
         <item itemvalue="Go 构建.go build 03.go" />
+        <item itemvalue="Go 构建.go build 02.go (1)" />
+        <item itemvalue="Go 构建.go build 01.go (3)" />
+        <item itemvalue="Go 构建.go build 01.go (2)" />
         <item itemvalue="Go 构建.go build 02.go" />
       </list>
     </recent_temporary>
