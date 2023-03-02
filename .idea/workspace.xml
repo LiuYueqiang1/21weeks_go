@@ -44,13 +44,21 @@
     &quot;last_opened_file_path&quot;: &quot;F:/goland/go_project/21weeks_go&quot;
   }
 }</component>
-  <component name="RunManager" selected="Go 构建.go build 03.go">
+  <component name="RunManager" selected="Go 构建.go build 01.go (3)">
+    <configuration name="go build 01.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="21weeks_go" />
+      <working_directory value="$PROJECT_DIR$/.." />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/40_defer/01.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build 01.go (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="21weeks_go" />
       <working_directory value="$PROJECT_DIR$/.." />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/26_pointer/01.go" />
+      <filePath value="$PROJECT_DIR$/41_panic_recover/01.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build 01.go (3)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -58,15 +66,15 @@
       <working_directory value="$PROJECT_DIR$/.." />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/33_homework/01.go" />
+      <filePath value="$PROJECT_DIR$/42_fmt/01.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build 02.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="go build 01.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="21weeks_go" />
       <working_directory value="$PROJECT_DIR$/.." />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/33_homework/02.go" />
+      <filePath value="$PROJECT_DIR$/39_bibao/01.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build 02.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -74,24 +82,16 @@
       <working_directory value="$PROJECT_DIR$/.." />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/31_silce/02.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build 03.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="21weeks_go" />
-      <working_directory value="$PROJECT_DIR$/.." />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/33_homework/03.go" />
+      <filePath value="$PROJECT_DIR$/39_bibao/02.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 构建.go build 03.go" />
-        <item itemvalue="Go 构建.go build 02.go (1)" />
         <item itemvalue="Go 构建.go build 01.go (3)" />
         <item itemvalue="Go 构建.go build 01.go (2)" />
         <item itemvalue="Go 构建.go build 02.go" />
+        <item itemvalue="Go 构建.go build 01.go (1)" />
+        <item itemvalue="Go 构建.go build 01.go" />
       </list>
     </recent_temporary>
   </component>
