@@ -36,7 +36,7 @@ func f3() {
 	s2[1] = 100
 	fmt.Println(s1)        //[1 100 3]
 	fmt.Println(s2)        //[1 100 3]
-	fmt.Println(s3)        //[1,2,3]  因为只是定义了s3但是没有分配内存，故为空
+	fmt.Println(s3)        //[1,2,3]
 	fmt.Println(s3 == nil) //false
 }
 func main() {

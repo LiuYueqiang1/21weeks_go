@@ -172,7 +172,15 @@ fmt.Println(*a) //panic: runtime error: invalid memory address or nil pointer de
 //必须分配内存
 ```
 
-new()
+### new()和make()
+
+![image-20230303132258768](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230303132258768.png)
+
+
+
+1. 二者都是用来做内存分配的。
+2. make只用于slice、map以及channel申请内存的，make函数返回的是对应的这三个类型的本身；
+3. new很少用，一般用来给基本数据类型申请内存，string、int，返回的是对应类型的指针（*string、*int）
 
 ```go
 func p3() {
