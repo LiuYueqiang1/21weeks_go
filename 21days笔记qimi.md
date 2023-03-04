@@ -141,6 +141,8 @@ Go语言中有个判断map中键是否存在的特殊写法，格式如下:
 value, ok := map[key]
 ```
 
+### delete()
+
 使用`delete()`内建函数从map中删除一组键值对
 
 ```go
@@ -181,6 +183,7 @@ fmt.Println(*a) //panic: runtime error: invalid memory address or nil pointer de
 1. 二者都是用来做内存分配的。
 2. make只用于slice、map以及channel申请内存的，make函数返回的是对应的这三个类型的本身；
 3. new很少用，一般用来给基本数据类型申请内存，string、int，返回的是对应类型的指针（*string、*int）
+4. 申请内存空间后，里面的值如何改变，这个内存地址都不变
 
 ```go
 func p3() {
@@ -191,6 +194,9 @@ func p3() {
    *a = 100
    fmt.Println(a)  //0xc00009e058
    fmt.Println(*a) //100
+    *a = 200
+	fmt.Println(a)  //0xc00009e058    //申请内存空间后，里面的值如何改变，这个内存空间的地址都不变
+	fmt.Println(*a) //200
 }
 func p4() {
    //Go里面的指针只能读不能修改，不能修改指针变量指向的地址
@@ -388,3 +394,322 @@ func main() {
 //释放数据库连接
 //3
 ```
+
+## 结构体
+
+
+
+51 函数内部修改的是副本
+
+复制
+
+只有当结构体实例化时，才会真正地分配内存。也就是必须实例化后才能使用结构体的字段。
+
+```go
+type person struct {
+	name, gender string
+	age          int
+}
+
+// Go语言中函数参数永远是拷贝
+func f(x person) {
+	x.gender = "女"
+}
+
+// 传入指针
+func f2(x *person) { //x *person  是person类型的指针，指向内存地址
+	//(*x).gender = "女"     可以简写为下面的类型
+	x.gender = "女" //语法糖，自动根据指针找到对应的变量
+}
+
+func main() {
+	var p person
+	p.name = "大风"
+	p.gender = "男"
+	f(p)
+	fmt.Println(p.gender) //男
+	f2(&p)                // 传入到f2中的必须是地址
+	fmt.Println(p.gender) //女
+	//******************
+	// 用new关键字对结构体进行实例化，得到的是结构体的地址
+	var p2 = new(person)
+	fmt.Printf("%T\n", p2)  //*main.person   类型
+	fmt.Printf("%#v\n", p2) //&main.person{name:"", gender:""}    //是什么
+	p2.age = 18
+	p2.name = "打算"
+	p2.gender = "男"
+	fmt.Printf("%#v\n", p2) //&main.person{name:"打算", gender:"男", age:18}
+}
+```
+
+p保存的值对应的地址，p的地址
+
+![image-20230304104440549](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304104440549.png)
+
+结构体指针赋值方式
+
+```go
+fmt.Printf("%T\n", p2)  //*main.person
+fmt.Printf("%p\n", p2)  //0xc000084180   p2保存的就是一块指向它保存数值的内存地址
+fmt.Printf("%p\n", &p2) //0xc0000ba020   &p2，p2的内存地址，&p2保存的数值只是一串数字
+```
+
+一个结构体占用一块连续的内存
+
+### 构造函数（包含地址的区别）
+
+**方便直接使用结构体**
+
+```go
+type person2 struct {
+   name string
+   age  int
+}
+//构造函数
+func newperson(na string, a int) *person2 {
+   return &person2{
+      name: na,
+      age:  a,
+   }
+}
+func main() {
+   p1 := newperson("那个", 18)
+   p2 := newperson("今年", 20)
+   fmt.Println(*p1) //*person2 类型的，故p1，p2是地址，需要用*p1取地址
+   fmt.Println(*p2)
+   fmt.Printf("%T\n", p1.name)  //string类型  ，因为这是直接改变person2来赋值的，但是person2是 struct类型 ，并不是指向地址
+   fmt.Printf("%p\n", &p1.name) //0xc000008078
+   fmt.Printf("%p\n", &p1.age)  //0xc000008088
+   fmt.Printf("%p\n", &p2.name) //0xc000008090
+   fmt.Printf("%p\n", &p2.age)  //0xc0000080a0
+   //一块结构体占用一块连续的内存
+   //*************这个没有申请内存空间，只是直接改变了  地址对应的值，所以地址也变化了，从地址层面操作的，不然函数只能赋值，
+  
+    //new 申请一个内存空间，直接从地址层面操作，直接改变地址对应的值    指针和值不是一一对应关系，指针对应的值可以改变
+   //上面也是从地址层面操作，不过改变的是值对应的地址，不然函数只有赋值值的操作，无法改变值，指针和值是一一对应关系
+}
+//参考看目录  pointer
+```
+
+结构体是值类型，赋值都是拷贝
+
+### 方法和接收者
+
+Go语言中的`方法（Method）`是一种作用于特定类型变量的函数。这种特定类型变量叫做`接收者（Receiver）`。接收者的概念就类似于其他语言中的`this`或者 `self`。
+
+方法的定义格式如下：
+
+```go
+func (接收者变量 接收者类型) 方法名(参数列表) (返回参数) {
+    函数体
+}
+```
+
+方法
+
+```go
+type dog struct {
+   name string
+}
+
+// 构造函数  调用结构体里面的东西 返回的是结构体名称
+func newDog(name string) *dog {
+   return &dog{
+      name: name,
+   }
+}
+// 方法是作用于特定类型的函数
+//
+// func (接收者变量 接收者类型) 方法名(参数列表) (返回参数) {
+//    函数体
+// }
+//
+// 传入的   传出的
+//接收者表示的是调用该方法的具体类型变量，多用类型名首字母小写表示
+func (d dog) wang() {
+   fmt.Printf("%s:汪汪汪\n", d.name)
+}
+func main() {
+   d1 := newDog("zzz") //返回的是结构体里面的东西，给d1
+   d1.wang()
+}
+```
+
+**标识符：变量名 函数名 类型名 方法名**
+
+go语言中如果标识符首字母是大写的，就表示对外部可见   
+
+### 值接收者和指针接收者：
+
+1. 需要修改接收者中的值
+2. 接收者是拷贝代价比较大的大对象
+3. 保证一致性，如果有某个方法使用了指针接收者，那么其他的方法也应该使用指针接收者。
+4. 一般都是用指针接收者
+
+ 只能给自己定义的类型添加方法
+
+```go
+//给自定义类型加方法
+//不能给别的暴力的类型添加方法，只能给自己包里的类型添加方法
+
+type newInt int
+
+// 方法    接受变量   方法名
+func (n newInt) hello() {
+   fmt.Println("这是一个int类型的方法")
+}
+
+func main() {
+   n1 := newInt(100)
+   fmt.Println(n1)
+   n1.hello()
+}
+```
+
+结构体遇到的问题：
+
+myInt（100）是个什么？
+
+```go
+//方法1：
+var x int32
+x=10
+//方法2：
+var x2 int32=10
+//方法3
+var x3=int32(10)
+//方法4
+x4:=int32(10)
+fmt.Println(x,x2,x3,x4)
+```
+
+```go
+//方法1
+var n1 newInt
+n1 = 100
+//方法2
+var n2 newInt = 100
+//方法3
+var n3 = newInt(100)
+//方法4
+n4 := newInt(100) //强制类型转换
+n4.hello()   
+fmt.Println(n1, n2, n3, n4)
+```
+
+初始化：
+
+```go
+type person3 struct {
+   name string
+   age  int
+}
+
+func main() {
+   var p person3
+   p.name = "史莱姆"
+   p.age = 100
+   fmt.Println(p)
+   var p1 = person3{
+      name: "五条悟",
+      age:  23,
+   }
+
+   fmt.Println(p1)
+   //方法2
+   s1 := []int{1, 2, 3, 4}
+   m1 := map[string]int{
+      "stu1": 100,
+      "stu2": 20,
+      "stu3": 50,
+   }
+   fmt.Println(s1, m1)
+
+   p3 := person3{
+      name: "维德鲁拉",
+      age:  1000,
+   }
+   fmt.Println(p3)
+}
+```
+
+3.为什么要有构造函数：
+
+```go
+//q3 为什么要有构造函数
+func newPerson3(name string, age int) person3 {
+   return person3{
+      age:  age,
+      name: name,
+   }
+```
+
+### 匿名字段
+
+没有名字的字段
+
+![image-20230304203840911](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304203840911.png)
+
+### 嵌套结构体
+
+ ![image-20230304204359851](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304204359851.png)
+
+#### 匿名嵌套结构体：
+
+用的比较多
+
+![image-20230304204604067](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304204604067.png)
+
+![image-20230304204630356](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304204630356.png)
+
+![image-20230304204954984](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304204954984.png)
+
+
+
+### 继承
+
+![image-20230304210951100](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304210951100.png)
+
+##  JSON
+
+www.json.cn
+
+1、把Go语言中结构体变量---->JSON格式的字符串             序列化
+
+2、JSON格式的字符串---->Go语言中能够识别的结构体变量            反序列化
+
+![image-20230304211807147](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304211807147.png)
+
+![image-20230304211823290](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304211823290.png)
+
+![image-20230304212925400](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304212925400.png)
+
+首字母为什么要大写：格式化的功能是JSON包里的marshal方法里把p1所有东西拿出来转化成一个字符串
+
+## 学生信息管理系统
+
+### 函数版
+
+写一个能够查看、新增、删除学生的系统
+
+功能：
+
+1、打印菜单
+
+2、等待用户执行操作
+
+3、执行对应的函数
+
+![image-20230304201806871](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304201806871.png)
+
+![image-20230304201908050](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304201908050.png)
+
+ 
+
+
+
+![image-20230304203344872](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304203344872.png)
+
+![image-20230304203456388](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304203456388.png)
+
+![image-20230304203546997](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304203546997.png)

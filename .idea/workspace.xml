@@ -44,54 +44,54 @@
     &quot;last_opened_file_path&quot;: &quot;F:/goland/go_project/21weeks_go&quot;
   }
 }</component>
-  <component name="RunManager" selected="Go 构建.go build 01.go">
-    <configuration name="go build 01.go (3)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="21weeks_go" />
-      <working_directory value="$PROJECT_DIR$/.." />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/42_fmt/01.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build 01.go (4)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="21weeks_go" />
-      <working_directory value="$PROJECT_DIR$/.." />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/27_map/01.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build 01.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="21weeks_go" />
-      <working_directory value="$PROJECT_DIR$/.." />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/46_homeword_coin/01.go" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Go 构建.go build method3.go">
     <configuration name="go build 02.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="21weeks_go" />
       <working_directory value="$PROJECT_DIR$/.." />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/33_homework/02.go" />
+      <filePath value="$PROJECT_DIR$/51_struct/02.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build work1.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="go build method2.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="21weeks_go" />
       <working_directory value="$PROJECT_DIR$/.." />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/27_map/work1.go" />
+      <filePath value="$PROJECT_DIR$/51_struct/method2.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build method3.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="21weeks_go" />
+      <working_directory value="$PROJECT_DIR$/.." />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/51_struct/method3.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build method.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="21weeks_go" />
+      <working_directory value="$PROJECT_DIR$/.." />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/51_struct/method.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build test.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="21weeks_go" />
+      <working_directory value="$PROJECT_DIR$/.." />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/51_struct/test.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 构建.go build 01.go" />
-        <item itemvalue="Go 构建.go build work1.go" />
+        <item itemvalue="Go 构建.go build method3.go" />
+        <item itemvalue="Go 构建.go build method2.go" />
+        <item itemvalue="Go 构建.go build method.go" />
+        <item itemvalue="Go 构建.go build test.go" />
         <item itemvalue="Go 构建.go build 02.go" />
-        <item itemvalue="Go 构建.go build 01.go (4)" />
-        <item itemvalue="Go 构建.go build 01.go (3)" />
       </list>
     </recent_temporary>
   </component>

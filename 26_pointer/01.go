@@ -27,6 +27,9 @@ func p3() {
 	*a = 100
 	fmt.Println(a)  //0xc00009e058
 	fmt.Println(*a) //100
+	*a = 200
+	fmt.Println(a)  //0xc00009e058    //申请内存空间后，里面的值如何改变，这个内存空间的地址都不变
+	fmt.Println(*a) //200
 }
 func p4() {
 	//Go里面的指针只能读不能修改，不能修改指针变量指向的地址
@@ -41,5 +44,5 @@ func p4() {
 	fmt.Println(&addeV) //0xc000044060
 }
 func main() {
-	p4()
+	p3()
 }
