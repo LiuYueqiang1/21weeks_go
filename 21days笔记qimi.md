@@ -646,29 +646,129 @@ func newPerson3(name string, age int) person3 {
 
 ### 匿名字段
 
-没有名字的字段
+```go
+// 匿名字段
+// 字段比较少比较简单
+// 不常用
+type person4 struct {
+   string
+   int
+}
 
-![image-20230304203840911](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304203840911.png)
+func main() {
+   p1 := person4{
+      "米栗木",
+      18,
+   }
+   fmt.Println(p1)
+}
+```
 
 ### 嵌套结构体
 
- ![image-20230304204359851](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304204359851.png)
+```go
+type person5 struct {
+   name string
+   age  int
+}
 
-#### 匿名嵌套结构体：
+// 嵌套结构体
+type company struct {
+   name string
+   pe   person5
+}
+
+func main() {
+   fmt.Println(p1)
+   c1 := company{
+      name: "华强集团",
+      pe: person5{
+         "刘华强",
+         28,
+      },
+   }
+   fmt.Println(c1)   //{华强集团 {刘华强 28}}
+}
+```
+
+#### 匿名嵌套结构体：***
 
 用的比较多
 
-![image-20230304204604067](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304204604067.png)
+```go
+type person5 struct {
+   name string
+   age  int
+}
+type address struct {
+   city string
+   mail string
+}
+// 嵌套结构体
+type company struct {
+   name    string
+   pe      person5
+   address //匿名嵌套结构体
+}
 
-![image-20230304204630356](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304204630356.png)
+func main() {
+   c1 := company{
+      name: "华强集团",
+      pe: person5{
+         "刘华强",
+         28,
+      },
+   }
+   fmt.Println(c1) //{华强集团 {刘华强 28}}
+   c2 := company{
+      name: "撒日朗",
+      pe: person5{
+         name: "华强",
+         age:  28,
+      },
+      address: address{
+         "北京不知名水果摊",
+         "保熟吗.com",
+      },
+   }
+   fmt.Println(c2.pe.name) //普通嵌套结构体    //华强
+   fmt.Println(c2.city)    //先在自己的结构体里查找该字段，找不到就去匿名嵌套的结构体中查找  //北京不知名水果摊
+   fmt.Println(c2)         //{撒日朗 {华强 28} {北京不知名水果摊 保熟吗.com}}
+}
+```
 
-![image-20230304204954984](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304204954984.png)
+### 继承*******
 
+```go
+// 继承
+type animal struct {
+   name string
+}
 
+func (a animal) move() {
+   fmt.Printf("%s会动\n", a.name)
+}
 
-### 继承
+type dog struct {
+   feet   uint8
+   animal //animal拥有的方法 和结构体，此时狗也拥有了
+}
 
-![image-20230304210951100](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304210951100.png)
+func (d dog) wang() {
+   fmt.Printf("%s会汪汪汪\n", d.name)
+}
+func main() {
+   d1 := dog{
+      feet: 4,
+      animal: animal{
+         name: "岚牙",
+      }, //类似于匿名嵌套结构体，但这是继承，可以使用animal的结构体
+   }
+   fmt.Println(d1) //{4 {岚牙}}
+   d1.wang()       //岚牙会汪汪汪
+   d1.move()       //继承自animal的方法    //岚牙会动
+}
+```
 
 ##  JSON
 
@@ -678,13 +778,82 @@ www.json.cn
 
 2、JSON格式的字符串---->Go语言中能够识别的结构体变量            反序列化
 
-![image-20230304211807147](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304211807147.png)
+```go
+**********************1************************
+type person struct {
+   name string
+   age  int
+}
 
-![image-20230304211823290](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304211823290.png)
+func main() {
+   p1 := person{
+      name: "州立",
+      age:  20,
+   }
+   //JSON序列化
+   b, err := json.Marshal(p1)
+   if err != nil {
+      fmt.Printf("marshal failed,err:%v", err)
+      return
+   }
+   fmt.Printf("%v\n", string(b)) //{}
+}
 
-![image-20230304212925400](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304212925400.png)
+**********************2************************
+// 首字母为什么要大写：格式化的功能是JSON包里的marshal方法里把p1所有东西拿出来转化成一个字符串
+type person2 struct {
+	Name string
+	Age  int
+}
 
-首字母为什么要大写：格式化的功能是JSON包里的marshal方法里把p1所有东西拿出来转化成一个字符串
+func main() {
+	p1 := person2{
+		Name: "州立",
+		Age:  20,
+	}
+	//JSON序列化
+	b, err := json.Marshal(p1)
+	if err != nil {
+		fmt.Printf("marshal failed,err:%v", err)
+		return
+	}
+	fmt.Printf("%v\n", string(b)) //{"Name":"州立","Age":20}
+}
+```
+
+```go
+**********************3************************
+// 首字母为什么要大写：格式化的功能是JSON包里的marshal方法里把p1所有东西拿出来转化成一个字符串
+type person3 struct {
+   Name string `json:"name"`
+   Age  int    `json:"age"`
+}
+
+func main() {
+   p1 := person3{
+      Name: "州立",
+      Age:  20,
+   }
+   //JSON序列化
+   b, err := json.Marshal(p1)
+   if err != nil {
+      fmt.Printf("marshal failed,err:%v", err)
+      return
+   }
+   fmt.Printf("%v\n", string(b))
+   //{"name":"州立","age":20}     用的JSON格式
+   //{"Name":"州立","Age":20}     未用JSON格式
+
+   //JSON反序列化
+   str := `{"name":"州立","age":20}`
+   //var p2 person3
+   //json.Unmarshal([]byte(str), &p2) //转化为字节类型的切片放入p2中
+   //fmt.Printf("%v", p2)           //{州立 20}
+   p2 := &person3{}
+   json.Unmarshal([]byte(str), p2) //转化为字节类型的切片放入p2中
+   fmt.Printf("%v", *p2)           //{州立 20}
+}
+```
 
 ## 学生信息管理系统
 
