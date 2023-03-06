@@ -972,3 +972,99 @@ func main() {
 函数版把所有的数据放到一个全局变量，所有的函数都操作那一个全局变量
 
 结构体版把管理系统作为一个物件，给这个物件赋予数据和动作，定义了一个结构体管理者的数据还有一些方法
+
+## 接口：是一种类型
+
+```go
+type 接口类型名 interface{
+    方法名1( 参数列表1 ) 返回值列表1
+    方法名2( 参数列表2 ) 返回值列表2
+    …
+}
+```
+
+接口是一种特殊的类型，它规定了变量有哪些方法。
+
+**场景**：不管传进来什么类型，我只关心它可以调用什么方法。
+
+```go
+type dog struct {
+   name string
+}
+type cat struct {
+   name string
+}
+// 方法
+func (d dog) speak() {
+   fmt.Printf("%v会汪汪汪~\n", d.name)
+}
+func (c cat) speak() {
+   fmt.Println(("喵喵喵~"))
+}
+type speaker interface { //接口是一种类型
+   speak() //接收到了什么方法
+}
+func da(x speaker) { //定义了一个名为da的函数，传入了一个变量，变量类型为接口类型
+   x.speak() //这个接口类型的变量做了什么方法
+}
+func main() {
+   var d1 dog
+   d1.name = "大黄"
+   var c1 cat
+   da(d1) //大黄会汪汪汪~
+   da(c1) //喵喵喵~
+}
+```
+
+**接口的使用**：
+
+1、定义结构体
+
+2、定义结构体可以使用的方法
+
+3、**定义一个接口**，接收到上述方法（接口是一种类型）
+
+4、定义一个函数，传入接口类型，**调用接口的方法**
+
+总结：结构体可以看作接口类型去调用这个方法。
+
+```go
+type baoshijie struct {
+   brand string
+}
+type falali struct {
+   brand string
+}
+func (b baoshijie) pao() {
+   fmt.Printf("%s的速度是700迈\n", b.brand)
+}
+func (f falali) pao() {
+   fmt.Printf("%s的速度是7000迈\n", f.brand)
+}
+type paoche interface { //定义接口     把执行这个方法的东西放到一起，定义为一个大类
+   pao()      		   //可以执行的方法
+}
+func drive(p paoche) { //执行方法 的函数
+   p.pao()
+}
+func main() {
+   b1 := baoshijie{
+      brand: "保时捷",
+   }
+   f1 := falali{
+      brand: "法拉利",
+   }
+   b1.pao()//保时捷的速度是700迈
+   f1.pao()//法拉利的速度是7000迈
+}
+```
+
+### 接口的实现
+
+ 一个变量如果实现了接口中规定的所有方法，那么这个变量就实现了这个接口，可以成为这个接口类型的变量。
+
+![image-20230306210501889](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306210501889.png)
+
+![image-20230306210629310](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306210629310.png)
+
+![image-20230306210645657](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306210645657.png)
