@@ -295,7 +295,7 @@ func main() {
 //1 1 3 4 
 ```
 
-## 闭包
+## 闭包***
 
 闭包是一个函数，这个函数包含了他外部作用域的一个变量
 
@@ -397,11 +397,13 @@ func main() {
 
 ## 结构体
 
+### 匿名结构体（多用于临时场景）
 
+![image-20230305172734707](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230305172734707.png)
 
 51 函数内部修改的是副本
 
-复制
+### 结构体的定义
 
 只有当结构体实例化时，才会真正地分配内存。也就是必须实例化后才能使用结构体的字段。
 
@@ -465,7 +467,7 @@ type person2 struct {
    name string
    age  int
 }
-//构造函数
+//构造函数                         返回值的类型
 func newperson(na string, a int) *person2 {
    return &person2{
       name: na,
@@ -502,10 +504,17 @@ Go语言中的`方法（Method）`是一种作用于特定类型变量的函数�
 ```go
 func (接收者变量 接收者类型) 方法名(参数列表) (返回参数) {
     函数体
-}
+}   
+//方法是接收者的函数，接收者指的是   哪个类型的变量   可以调用这个函数
 ```
 
 方法
+
+当在方法里需要**修改结构体变量的值**时需要用**指针**接收者
+
+例如：过年年龄+1的方法
+
+
 
 ```go
 type dog struct {
@@ -526,6 +535,7 @@ func newDog(name string) *dog {
 //
 // 传入的   传出的
 //接收者表示的是调用该方法的具体类型变量，多用类型名首字母小写表示
+//只有接收者这个类型的变量可以调用这个函数
 func (d dog) wang() {
    fmt.Printf("%s:汪汪汪\n", d.name)
 }
@@ -770,6 +780,10 @@ func main() {
 }
 ```
 
+### 自定义类型和类型别名
+
+![image-20230305195431512](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230305195431512.png)
+
 ##  JSON
 
 www.json.cn
@@ -844,7 +858,7 @@ func main() {
    //{"name":"州立","age":20}     用的JSON格式
    //{"Name":"州立","Age":20}     未用JSON格式
 
-   //JSON反序列化
+   //JSON反序列化   反序列化时要传递指针
    str := `{"name":"州立","age":20}`
    //var p2 person3
    //json.Unmarshal([]byte(str), &p2) //转化为字节类型的切片放入p2中
@@ -854,6 +868,8 @@ func main() {
    fmt.Printf("%v", *p2)           //{州立 20}
 }
 ```
+
+![image-20230305195232197](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230305195232197.png)
 
 ## 学生信息管理系统
 
@@ -869,16 +885,90 @@ func main() {
 
 3、执行对应的函数
 
-![image-20230304201806871](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304201806871.png)
+```go
+var allStudent map[int]*student //声明学生变量
 
-![image-20230304201908050](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304201908050.png)
+type student struct {
+   ID   int
+   Name string
+}
 
- 
+func newstudent(id int, name string) *student {
+   return &student{
+      ID:   id,
+      Name: name,
+   }
+}
 
+func showStudent() {
+   for i, v := range allStudent {
+      fmt.Printf("学号：%d 姓名：%s\n", i, v.Name)
+   }
+}
+func addStudent() {
+   var (
+      id   int
+      name string
+   )
+   fmt.Println("请输入学生的学号：")
+   fmt.Scanln(&id)
+   fmt.Println("请输入学生的姓名：")
+   fmt.Scanln(&name)
+   //造学生
+   newStu := newstudent(id, name)
+   //追加到map中
+   allStudent[id] = newStu
+}
+func delteStudent() {
+   var deleteID int
+   fmt.Println("请输入要删除的学号：")
+   fmt.Scanln(&deleteID)
+   delete(allStudent, deleteID)
+}
+func main() {
+   allStudent = make(map[int]*student, 50)
+   for {
+      fmt.Println("欢迎来到学生管理系统")
+      fmt.Println("请输入您的操作：")
+      fmt.Println("1、查看所有学生信息")
+      fmt.Println("2、添加学生")
+      fmt.Println("3、删除学生信息")
+      fmt.Println("4、退出学生信息管理系统")
+      var choice int
+      fmt.Scanln(&choice)
+      switch choice {
+      case 1:
+         showStudent()
+      case 2:
+         addStudent()
+      case 3:
+         delteStudent()
+      case 4:
+         fmt.Println("再见！")
+         os.Exit(1)
+      default:
+         fmt.Println("无效输入！")
+      }
+   }
+}
+```
 
+### 结构体版
 
-![image-20230304203344872](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304203344872.png)
+![image-20230306112115568](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306112115568.png)
 
-![image-20230304203456388](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304203456388.png)
+![image-20230306112312364](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306112312364.png)
 
-![image-20230304203546997](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230304203546997.png)
+![image-20230306112639494](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306112639494.png)
+
+![image-20230306112535745](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306112535745.png)  
+
+![image-20230306112509409](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306112509409.png)
+
+![image-20230306112447475](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306112447475.png)
+
+### 区别：
+
+函数版把所有的数据放到一个全局变量，所有的函数都操作那一个全局变量
+
+结构体版把管理系统作为一个物件，给这个物件赋予数据和动作，定义了一个结构体管理者的数据还有一些方法
