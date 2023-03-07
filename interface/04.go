@@ -27,6 +27,7 @@ func hunr(a animal) {
 }
 func main() {
 	var aa animal
+	fmt.Printf("接口的类型:%T\n", aa)
 	aa = catt{
 		name: "米粒",
 		feet: 8,

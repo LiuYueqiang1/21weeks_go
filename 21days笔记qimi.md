@@ -1069,7 +1069,7 @@ func main() {
 
 ![image-20230306210645657](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306210645657.png)
 
-```
+```go
 // 接口的实现
 type catt struct {
    name string
@@ -1095,7 +1095,8 @@ func hunr(a animal) {
 }
 func main() {
    var aa animal
-   aa = catt{
+   fmt.Printf("接口的类型:%T\n", aa)//接口的类型:<nil>   开始的时候
+    aa = catt{
       name: "米粒",
       feet: 8,
    }
@@ -1109,3 +1110,130 @@ func main() {
    //花花爱吃吃猫粮...
 }
 ```
+
+### 接口值
+
+接口类型的变量分为两部分：值类型和值
+
+![image-20230307143713076](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307143713076.png)
+
+### 值接收者和指针接收者
+
+使用值接收者实现接口，结构体类型和结构体指针类型的变量都能存
+
+```go
+func (c cat) move() {     //值接收者
+   fmt.Println("猫猫出击")
+}
+func (c cat) eat(food string) {
+   fmt.Printf("%s爱吃吃%s...\n", c.name, food)
+}
+func main(){
+    var a1 animal
+    c1:=cat{"tom",4} //cat
+    c2:=car{"汤姆",4}//*cat
+    a1:=&c1
+    fmt.Println(a1)
+    a1:=c2
+    fmt.Println(a1)
+}
+```
+
+指针接收者实现接口只能存结构体指针类型的变量
+
+```go
+func (c *cat) move() {     //值接收者
+   fmt.Println("猫猫出击")
+}
+func (c *cat) eat(food string) {
+   fmt.Printf("%s爱吃吃%s...\n", c.name, food)
+}
+func main(){
+    var a1 animal
+    c1:=cat{"tom",4} //cat
+    c2:=&car{"汤姆",4}//*cat     c2必须是指针，否则无法保存
+    a1:=&c1
+    fmt.Println(a1)
+    a1:=c2
+    fmt.Println(a1)
+}
+```
+
+### 接口和类型的关系
+
+多个类型可以执行一个接口      猫狗都使用叫的接口
+
+一个类型可以实现多个接口		一个猫即会叫又会跑
+
+```go
+// 一个类型实现多个接口
+type cat2 struct { //一个类型
+   name string
+}
+func (c *cat2) move() {
+   fmt.Println("猫猫出击")
+}
+func (c *cat2) speak() {
+   fmt.Println("喵喵叫")
+}
+type movee interface { //一个接口对应一个方法
+   move()
+}
+type speakk interface { //一个接口对应一个方法，一个接口也可以对应多个方法
+   speak()
+}
+type sum interface { //使用一个接口  调用两个接口的类型名字
+   speakk
+   movee
+}
+func main() {
+   var m1 movee
+   m1 = &cat2{
+      "米粒",
+   }
+   m1.move()
+   var s1 speakk
+   s1 = &cat2{
+      name: "米粒",
+   }
+   s1.speak()
+   //*****
+   var ss sum //调用两个接口 放入一个接口中
+   ss = &cat2{
+      name: "米粒",
+   }
+   ss.move()
+   ss.speak()
+}
+```
+
+### 空接口
+
+![image-20230307153940242](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307153940242.png)
+
+![image-20230307154118721](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307154118721.png)
+
+![image-20230307155145461](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307155145461.png)
+
+### 类型断言：
+
+![image-20230307155737239](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307155737239.png)
+
+## 包
+
+### 包的导入：
+
+![image-20230307162645943](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307162645943.png)
+
+### init()
+
+![image-20230307163601366](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307163601366.png)
+
+## 作业
+
+自己写一个日志库
+
+接口：日志可以输出到终端，也可以输出到文件，输出到kafka
+
+文件操作
+
