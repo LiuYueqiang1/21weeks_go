@@ -1237,3 +1237,219 @@ func main() {
 
 文件操作
 
+### 需求：
+
+1.可以往不同的输出位置记录日志
+
+2.日志分为五种级别
+
+![image-20230308112457054](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230308112457054.png)
+
+## 文件操作：
+
+### 在终端输入时有空格
+
+fmt.Scanln只能读到空格或者回车
+
+![image-20230308111637006](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230308111637006.png)
+
+![image-20230308111834553](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230308111834553.png)
+
+### 读取文件内容
+
+#### （1）按字节读文件后输出
+
+##### **os:**
+
+打开文件：
+
+```
+func Open(name string) (file *File, err error)
+```
+
+Open打开一个文件用于读取。如果操作成功，返回的文件对象的方法可用于读取数据；对应的文件描述符具有O_RDONLY模式。如果出错，错误底层类型是*PathError
+
+读取文件：
+
+```
+func (f *File) Read(b []byte) (n int, err error)
+```
+
+Read方法从f中读取最多len(b)字节数据并写入b。它返回读取的字节数和可能遇到的任何错误。文件终止标志是读取0个字节且返回值err为io.EOF。
+
+```go
+func readfromRead() {
+   fileObj, err := os.Open("F:\\goland\\go_project\\21weeks_go\\71_file\\01.go") //打开文件
+   if err != nil {
+      fmt.Printf("open file failed,%v\n", err)
+      return
+   }
+   defer fileObj.Close()
+   //读文件
+   var tmp = make([]byte, 128) //读取指定长度
+   for {
+       n, err := fileObj.Read(tmp)//文件名.Read(写入到tmp中)，tmp是一个切片
+      //func (f *File) Read(b []byte) (n int, err error)
+      //Read是一个方法，*File是接收者，读文件*file，写入到b中，返回一个读到的数量n的和一个错误
+      if err == io.EOF {
+         fmt.Println("读完了")
+         return
+      }
+      if err != nil {
+         fmt.Printf("Read is failed,%v\n", err)
+         return
+      }
+      fmt.Printf("读了%v个字节\n", n)
+      fmt.Println(string(tmp))  //打印写入的文件
+      if n < 128 { //如果最后读的字节数<128，则这次已经读完了，直接return for循环
+         return
+      }
+   }
+}
+```
+
+#### （2）按行读
+
+创建一个从文件中读取内容的对象 
+
+```
+func NewReader(rd io.Reader) *Reader
+```
+
+##### bufio:
+
+NewReader创建一个具有默认大小缓冲、从r读取的*Reader。
+
+```
+func (b *Reader) ReadString(delim byte) (line string, err error)
+```
+
+ReadString读取直到第一次遇到delim字节，返回一个包含已读取的数据和delim字节的字符串。如果ReadString方法在读取到delim之前遇到了错误，它会返回在错误之前读取的数据以及该错误（一般是io.EOF）。当且仅当ReadString方法返回的切片不以delim结尾时，会返回一个非nil的错误
+
+```go
+func readfrombufio() {
+   fileObj, err := os.Open("F:\\goland\\go_project\\21weeks_go\\71_file\\01.go") //打开文件
+   if err != nil {
+      fmt.Printf("open file failed,%v\n", err)
+      return
+   }
+   defer fileObj.Close()
+   //按行读取文件
+   //创建一个用来从文件中读取内容的对象
+   reader := bufio.NewReader(fileObj)
+   for {
+      line, err := reader.ReadString('\n')
+      if err == io.EOF {
+         fmt.Println("文件读取完毕")
+         return
+      }
+      if err != nil {
+         fmt.Printf("文件读取错误，%v\n", err)
+         return
+      }
+      fmt.Print(line)
+   }
+}
+```
+
+#### （3）直接读取文件
+
+##### **ioutil:**
+
+本函数定义为读取整个文件，它不会将读取返回的EOF视为应报告的错误
+
+```go
+func readFromFileByIouttil() {
+   ret, err := ioutil.ReadFile("F:\\goland\\go_project\\21weeks_go\\71_file\\01.go")
+   if err != nil {
+      fmt.Printf("文件读取错误，%v\n", err)
+      return
+   }
+   fmt.Println(string(ret))
+}
+```
+
+### 文件写入操作
+
+#### （1）按字节写入
+
+##### **os:**
+
+```
+func OpenFile(name string, flag int, perm FileMode) (file *File, err error)
+```
+
+OpenFile是一个更一般性的文件打开函数，大多数调用者都应用Open或Create代替本函数。它会使用指定的选项（如O_RDONLY等）、指定的模式（如0666等）打开指定名称的文件。如果操作成功，返回的文件对象可用于I/O。如果出错，错误底层类型是*PathError。
+
+```go
+// 文件写入操作
+func write1() {
+   fileObj, err := os.OpenFile("F:\\goland\\go_project\\21weeks_go\\71_file\\writetest.txt", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0256)
+   if err != nil {
+      fmt.Printf("open file is failed,err:%v\n", err)
+      return
+   }
+   defer fileObj.Close()
+   str := "hello 沙河\n"
+   fileObj.Write([]byte(str))
+   fileObj.WriteString("hello 小王子\n")
+}
+```
+
+#### （2）按行写入
+
+##### bufio:
+
+```
+func NewWriter(w io.Writer) *Writer
+```
+
+NewWriter创建一个具有默认大小缓冲、写入w的*Writer。
+
+```
+func (b *Writer) WriteString(s string) (int, error)
+```
+
+WriteString写入一个字符串。返回写入的字节数。如果返回值nn < len(s)，还会返回一个错误说明原因。
+
+```
+func (b *Writer) Flush() error
+```
+
+Flush方法将缓冲中的数据写入下层的io.Writer接口。
+
+```go
+// 按行写入
+func bufio_NewWriter() {
+   fileObi, err := os.OpenFile("F:\\goland\\go_project\\21weeks_go\\71_file\\writetest.txt", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0234)
+   if err != nil {
+      fmt.Printf("open file is failed,err:%v\n", err)
+      return
+   }
+   defer fileObi.Close()
+   writer := bufio.NewWriter(fileObi)
+   writer.WriteString("hello 沙河\n") //将数据先写入缓存    (没写返回值)
+   writer.Flush()                   //将缓存中的内容写入文件
+}
+```
+
+#### （3）按文件写入
+
+##### ioutil：
+
+```
+func WriteFile(filename string, data []byte, perm os.FileMode) error
+```
+
+函数向filename指定的文件中写入数据。如果文件不存在将按给出的权限创建文件，否则在写入数据之前清空文件。
+
+```go
+func ioutilsritefile() {
+   str := "hello 沙河筱往"
+   err := ioutil.WriteFile("F:\\goland\\go_project\\21weeks_go\\71_file\\writetest.txt", []byte(str), 0253)
+   if err != nil {
+      fmt.Println("文件写入失败", err)
+      return
+   }
+}
+```
