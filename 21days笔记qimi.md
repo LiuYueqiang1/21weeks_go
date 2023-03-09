@@ -1251,7 +1251,33 @@ func main() {
 
 fmt.Scanln只能读到空格或者回车
 
-![image-20230308111637006](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230308111637006.png)
+```go
+// 获取用户输入时如果有空格
+func useScan() {
+   var s string
+   fmt.Println("请输入内容：")
+   fmt.Scanln(&s) //读到空格或者enter就停止
+   fmt.Printf("您输入的内容是%s\n", s)
+}
+
+// 使用bufio 可以获取整行
+func useBufio() {
+   var s string
+   reader := bufio.NewReader(os.Stdin)   //os的从终端中输入内容
+   fmt.Println("请输入内容")
+   s, _ = reader.ReadString('\n')
+   fmt.Printf("您输入的内容是：%s\n", s)
+}
+func main() {
+   //useScan()
+   //请输入内容：
+   //a b c d e
+   //您输入的内容是a
+   useBufio()
+   //a s d f s d
+   //您输入的内容是：a s d f s d 
+}
+```
 
 ![image-20230308111834553](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230308111834553.png)
 
@@ -1453,3 +1479,73 @@ func ioutilsritefile() {
    }
 }
 ```
+
+## 回顾
+
+### 包
+
+![image-20230309085612476](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230309085612476.png)
+
+包的定义
+
+包的导入
+
+### 接口
+
+接口是一种类型，一种抽象的类型
+
+接口就是你要实现的方法的清单
+
+接口的定义
+
+接口的实现
+
+实现了接口的所有方法就实现了这个接口
+
+实现啦接口就可以当成这个接口类型的变量
+
+接口变量
+
+实现了一个万能的变量，可以保存所有实现了我这个接口的类型的值
+
+通常是作为函数的参数出现
+
+### 空接口
+
+`interface{}`：空接口
+
+接口中没有定义任何方法们也就是说任意类型都实现了空接口-->任何类都可以存到空接口变量中
+
+接口底层
+
+动态类型
+
+动态值
+
+类型断言
+
+做类型断言的前提是一定要是一个接口的变量
+
+![image-20230309092119380](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230309092119380.png)
+
+![image-20230309092106310](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230309092106310.png)
+
+### 文件操作
+
+打开文件和关闭文件
+
+读文件
+
+写文件
+
+![image-20230309093310207](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230309093310207.png)
+
+![image-20230309095107760](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230309095107760.png)
+
+断电数据丢失
+
+插入内容：
+
+![image-20230309104555031](F:\goland\go_project\21weeks_go\typora-user-images\image-20230309104555031.png)
+
+![image-20230309104624876](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230309104624876.png)
