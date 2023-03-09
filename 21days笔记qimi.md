@@ -1209,15 +1209,56 @@ func main() {
 
 ### 空接口
 
-![image-20230307153940242](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307153940242.png)
-
-![image-20230307154118721](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307154118721.png)
-
-![image-20230307155145461](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307155145461.png)
+```go
+// 空接口作为函数参数
+func show(a interface{}) {
+   fmt.Printf("type:%T value:%v\n", a, a)
+}
+func main() {
+   var m1 map[string]interface{}
+   m1 = make(map[string]interface{}, 10)
+   m1["name"] = "shadowracket"
+   m1["age"] = 9000
+   m1["merried"] = false
+   m1["hobby"] = []string{"唱", "跳", "rap"}
+   fmt.Println(m1) //map[age:9000 hobby:[唱 跳 rap] merried:false name:shadowracket]
+   show(false)     //type:bool value:false
+   show(m1)//type:map[string]interface {} value:map[age:9000 hobby:[唱 跳 rap] merried:false  name:shadowracket]
+}
+```
 
 ### 类型断言：
 
-![image-20230307155737239](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307155737239.png)
+```go
+// 类型断言
+// 不仅可以输出类型，还可以调用这个
+// 而%T不可以
+func assign(a interface{}) {
+   fmt.Printf("%T\n", a)
+   switch t := a.(type) {
+   case string:
+      fmt.Println("字符串类型", t)
+   case int:
+      fmt.Println("整型", t)
+   case int64:
+      fmt.Println("int64类型", t)
+   case bool:
+      fmt.Println("bool型", t)
+   }
+}
+func assign2(a interface{}) {
+   fmt.Printf("%T\n", a)
+   str, ok := a.(string)
+   if ok {
+      fmt.Println("字符串类型", str)
+   } else {
+      fmt.Println("不是字符串")
+   }
+}
+func main() {
+   assign2("你好")
+}
+```
 
 ## 包
 
@@ -1528,8 +1569,6 @@ func ioutilsritefile() {
 
 ![image-20230309092119380](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230309092119380.png)
 
-![image-20230309092106310](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230309092106310.png)
-
 ### 文件操作
 
 打开文件和关闭文件
@@ -1545,6 +1584,8 @@ func ioutilsritefile() {
 断电数据丢失
 
 插入内容：
+
+![1678351456698](E:\微信文件\WeChat Files\wxid_kzwuksrgolt722\FileStorage\Temp\1678351456698.png)
 
 ![image-20230309104555031](F:\goland\go_project\21weeks_go\typora-user-images\image-20230309104555031.png)
 
