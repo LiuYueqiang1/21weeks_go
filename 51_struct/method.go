@@ -2,13 +2,13 @@ package main
 
 import "fmt"
 
-type dog struct {
+type dog1 struct {
 	name string
 }
 
 // 构造函数  调用结构体里面的东西 返回的是结构体名称
-func newDog(name string) *dog {
-	return &dog{
+func newDog(name string) *dog1 {
+	return &dog1{
 		name: name,
 	}
 }
@@ -21,7 +21,7 @@ func newDog(name string) *dog {
 //
 // 传入的   传出的
 // 接收者表示的是调用该方法的具体类型变量，多用类型名首字母小写表示
-func (d dog) wang() {
+func (d dog1) wang() {
 	fmt.Printf("%s:汪汪汪\n", d.name)
 }
 func main() {
