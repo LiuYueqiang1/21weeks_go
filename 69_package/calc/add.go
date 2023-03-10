@@ -1,8 +1,8 @@
 package calc
 
 import (
+	"21weeks/21weeks_go/69_package/snow"
 	"fmt"
-	"go_project/package/snow"
 )
 
 // Name 是一个测试的全局变量，首字母需要大写

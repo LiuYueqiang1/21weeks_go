@@ -1,7 +1,7 @@
 package main
 
 import (
-	test "69_package/calc"
+	test "21weeks/21weeks_go/69_package/calc"
 	"fmt"
 )
 
