@@ -50,7 +50,7 @@ func main() {
 5. ​	Fatal：错误
 6. ​	Trace
 
-3、日志要支持开关控制
+3、日志要支持开关控制，比如说开发的时候什么级别都能输出，但是上线之后只有INFO级别往下的才能输出
 
 4、完整的日志记录要有时间、行号、文件名、日志级别、日志信息
 
@@ -86,3 +86,16 @@ mylogger_test：是
 
 ![image-20230310112753309](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230310112753309.png)
 
+## 87 反射
+
+**了解原理即可**
+
+1、JSON格式化，动态获取传进来的变量类型
+
+![image-20230311105133853](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230311105133853.png)
+
+![image-20230311113526319](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230311113526319.png)
+
+读取加载到main文件中
+
+![image-20230311113833960](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230311113833960.png)

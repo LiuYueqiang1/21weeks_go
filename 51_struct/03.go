@@ -27,6 +27,8 @@ type company struct {
 }
 
 func main() {
+	//	person5.name=  非法的吧
+
 	p1 := person4{
 		"米栗木",
 		18,

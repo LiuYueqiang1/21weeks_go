@@ -19,6 +19,7 @@ func main() {
 	//取出所有的key存入切片
 	keys := make([]string, 0, 100)
 	for key := range scoremap {
+		fmt.Println(key)
 		keys = append(keys, key)
 	}
 	//对切片进行排序
