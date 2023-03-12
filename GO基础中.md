@@ -99,3 +99,104 @@ mylogger_test：是
 读取加载到main文件中
 
 ![image-20230311113833960](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230311113833960.png)
+
+![image-20230312212719385](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312212719385.png)
+
+![image-20230312213446828](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312213446828.png) 
+
+![image-20230312213915443](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312213915443.png)
+
+![image-20230312214730622](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312214730622.png)
+
+![image-20230312215002748](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312215002748.png)
+
+![image-20230312215329343](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312215329343.png)
+
+![image-20230312220713152](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312220713152.png)
+
+![image-20230312221056685](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312221056685.png)
+
+根据结构体名字找数据： structName
+
+![image-20230312221551571](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312221551571.png)
+
+
+
+![image-20230312221826006](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312221826006.png)
+
+![image-20230312221930892](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312221930892.png)
+
+![image-20230312222618717](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312222618717.png)
+
+判断conf是否有空行
+
+![image-20230312222659718](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312222659718.png)
+
+2.3.2
+
+拿着mysqoconfig这个字符串把这个结构体取出
+
+找到=的位置，且判断去取值的 是否是一个结构体
+
+![image-20230312223244774](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312223244774.png)
+
+### 作业
+
+conf.ini文件
+
+![image-20230312211833933](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230312211833933.png)
+
+
+
+## 内容回顾
+
+'2006-01-02 15:04:05.000'
+
+### 时间类型
+
+time.Time：time.Now()
+
+时间戳:
+
+time.Now().Unix():1970.1.1到现在的秒数
+
+time.Now().UnixNano():1970.1.1到现在的纳秒数
+
+time包的Time类型
+
+### 时间间隔类型
+
+time.Duration:时间间隔类型
+
+time.Second
+
+### 时间操作
+
+事件对象+/.一个时间间隔对象
+
+### 时间格式化
+
+2006-01-02 15:04:05.000
+
+### 定时器
+
+每隔一秒钟执行一次
+
+### 解析字符串格式的时间（时区）
+
+### 日志库
+
+之前学的内容的整合****
+
+### 反射
+
+接口类型的底层变量食分为两部分：动态类型和动态值
+
+反射的应用：`json`等数据解析\ORM等工具
+
+### 反射的两个方法
+
+`reflect.TypeOf()`
+
+`reflect.ValueOf()`
+
