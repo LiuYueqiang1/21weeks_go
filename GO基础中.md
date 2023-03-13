@@ -216,37 +216,152 @@ time.Second
 
 把字符串解析成数据
 
-错误写法：
-
-![image-20230313090301317](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313090301317.png)
-
 string（）：拿着字符串做utf8编码找对应的符号 
 
-![image-20230313090805361](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313090805361.png)
+```
+func ParseInt(s string, base int, bitSize int) (i int64, err error)
+```
 
-![image-20230313091002697](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313091002697.png)
+返回字符串表示的整数值，接受正负号。
+
+base指定进制（2到36），如果base为0，则会从字符串前置判断，"0x"是16进制，"0"是8进制，否则是10进制；
+
+bitSize指定结果必须能无溢出赋值的整数类型，0、8、16、32、64 分别代表 int、int8、int16、int32、int64；返回的err是*NumErr类型的，如果语法有误，err.Error = ErrSyntax；如果结果超出类型范围err.Error = ErrRange。
+
+```
+func Sprintf(format string, a ...interface{}) string
+```
+
+Sprintf根据format参数生成格式化的字符串并返回该字符串。
+
+```go
+	str := "10000"
+	//ret3 := int64(str)
+	ret1, _ := strconv.ParseInt(str, 10, 64)
+	fmt.Printf("%#v %T\n", ret1, ret1) //10000 int64
+	i := int32(97)
+	ret4 := string(i)
+	fmt.Println("ret4:", ret4)//a
+	ret2 := fmt.Sprintf("%d", i)
+	fmt.Printf("%#v", ret2) //"97"
+```
 
 ParsetInt：10进制，  
 
-![image-20230313091417886](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313091417886.png)
+```
+func Atoi(s string) (i int, err error)
+```
 
-![image-20230313091525408](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313091525408.png)
+Atoi是ParseInt(s, 10, 0)的简写。
 
-![image-20230313091723181](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313091723181.png)
+```
+func Itoa(i int) string
+```
+
+Itoa是FormatInt(i, 10) 的简写。
+
+```
+func ParseBool(str string) (value bool, err error)
+```
+
+返回字符串表示的bool值。它接受1、0、t、f、T、F、true、false、True、False、TRUE、FALSE；否则返回错误。
+
+```
+func ParseFloat(s string, bitSize int) (f float64, err error)
+```
+
+解析一个表示浮点数的字符串并返回其值。
+
+如果s合乎语法规则，函数会返回最为接近s表示值的一个浮点数（使用IEEE754规范舍入）。bitSize指定了期望的接收类型，32是float32（返回值可以不改变精确值的赋值给float32），64是float64；返回值err是*NumErr类型的，语法有误的，err.Error=ErrSyntax；结果超出表示范围的，返回值f为±Inf，err.Error= ErrRange
+
+```go
+func main() {
+    //字符串转换为数字
+   str := "10000"
+   retInt, _ := strconv.Atoi(str)
+    fmt.Printf("%#v %T\n", retInt, retInt)//10000 int
+   fmt.Println(retInt) //10000
+   //把数字转换为字符串类型
+   i := int32(97)
+   ret1 := string(i)
+   fmt.Println(ret1) //a
+   ret2 := fmt.Sprintf("%d", i)
+   fmt.Printf("%#v\n", ret2) //"97"
+   ret3 := strconv.Itoa(int(i))
+   fmt.Printf("%#v\n", ret3) //"97"
+   //从字符串中解析出bool值
+   boolStr := "true"
+   boolValue, _ := strconv.ParseBool(boolStr)
+   fmt.Printf("%#v %T\n", boolValue, boolValue) //true bool
+   //从字符串中解析出浮点数
+   floatStr := "1.234"
+   floatValue, _ := strconv.ParseFloat(floatStr, 64)
+   fmt.Printf("%#v %T\n", floatValue, floatValue)//1.234 float64
+}
+```
 
 ## 并发***
 
+### 引入
+
 只是打印的比较慢，操作系统一直在输出
 
-![image-20230313094700702](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313094700702.png)
+```go
+func hello(i int) {
+   fmt.Println("hello", i)
+}
+
+// 程序启动之后创建一个主goroutine去执行
+func main() {
+   for i := 0; i < 100; i++ {
+      go hello(i) //开启一个单独的goroutine去执行hello函数
+   }
+   fmt.Println("main")
+   time.Sleep(time.Second)
+   //main函数结束了 由main函数启动的goroutine也结束了
+}
+```
 
 闭包：可能会执行很多个gorountain
 
-![image-20230313095014758](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313095014758.png)
+```go
+func main() {
+   for i := 0; i < 100; i++ {
+      go func() {
+         fmt.Println(i)
+      }()
+   }
+   fmt.Println("main")
+   time.Sleep(time.Second)
+}
+
+//执行了很多个匿名函数，因为一次循环的时间可以执行多个goroutine
+//94
+//9
+//98
+//99
+//99
+//99
+//99
+//100
+//100
+```
 
 调用函数参数的i
 
-![image-20230313095108290](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313095108290.png)
+```go
+//给匿名函数传入循环的参数 
+//这样的话一次只能调用一个
+func main() {
+   for i := 0; i < 100; i++ {
+      go func(a int) {
+         fmt.Println(a)
+      }(i)
+   }
+   fmt.Println("main")
+   time.Sleep(time.Second)
+}
+```
 
 总结：启动go routine耗费一些资源和时间
 
@@ -258,13 +373,33 @@ go routine对应的函数结束了，go routine就结束了
 
 `main`函数执行完后，由`main`函数创建的那些go routine都结束了
 
-![image-20230313102118022](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313102118022.png)
+### sync.WaitGroup  计数器
 
-![image-20230313102150764](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313102150764.png)
+```go
+var wg sync.WaitGroup
 
-![image-20230313102219813](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313102219813.png)
-
-![image-20230313102334021](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230313102334021.png)
+func f() {
+   rand.Seed(time.Now().UnixNano())
+   for i := 0; i < 5; i++ {
+      r1 := rand.Int() //int64
+      r2 := rand.Intn(10)
+      fmt.Println(r1, r2)
+   }
+}
+func f1(i int) {
+	defer wg.Done() //计数器-1
+	time.Sleep(time.Millisecond * time.Duration(rand.Intn(300)))
+	fmt.Println(i)
+}
+func main() {
+	for i := 0; i < 10; i++ {
+		wg.Add(1) //计数器+1
+		//如果计数器变为零，则释放在Wait上阻塞的所有goroutine
+		go f1(i)
+	}
+	wg.Wait() //等待直到counter变为0
+}
+```
 
 **面试问题 goroutine调度模型：**
 
@@ -294,7 +429,97 @@ gomaxprocs（1）只有一个工作的
 
 gomaxprocs（6）默认cpu的逻辑核心数，默认跑满整个CPU
 
-<!-- vim-markdown-toc GFM -->
+## channel
+
+如果说 goroutine 是Go程序并发的执行体，`channel`就是它们之间的连接。`channel`是可以让一个 goroutine 发送特定值到另一个 goroutine 的通信机制
+
+```go
+var b chan int//需要指定通道中元素的类型
+```
+
+通道的操作
+
+1、发送：`ch1 <- 1`
+
+2、接受：`x:=<- ch1`
+
+`<- ch1`:丢了 
+
+3、关闭：`close()`
+
+### 无缓冲通道
+
+```go
+// 先从通道中获取数据，再向通道存入数据
+var a []int
+var b chan int
+var wg sync.WaitGroup
+
+func main() {
+   fmt.Println(b) //<nil>
+   b = make(chan int)
+   wg.Add(1)
+   go func() {
+      defer wg.Done()
+      x := <-b
+      fmt.Println("后台goroutine从通道b中获取到了", x) //后台goroutine从通道b中获取到了 10
+   }()
+   b <- 10
+   fmt.Println("10发送到通道b中了") //10发送到通道b中了
+   b = make(chan int, 16)
+   fmt.Println(b)//0xc00010a000
+   wg.Wait()
+}
+```
+
+
+
+```go
+// 先向通道存入数据,再从通道中获取数据
+var a1 []int
+var b1 chan int
+var wg1 sync.WaitGroup
+
+func main() {
+   fmt.Println(b1) //<nil>
+   b1 = make(chan int)
+   wg1.Add(1)
+   go func() {
+      defer wg1.Done()
+      b1 <- 10
+      fmt.Println("10发送到通道b中了", b1) //10发送到通道b中了 0xc00001c120
+   }()
+
+   x := <-b1
+   fmt.Println("后台goroutine从通道b中获取到了", x) //后台goroutine从通道b中获取到了 10
+   b1 = make(chan int, 16)
+   fmt.Println(b1) //0xc00010a000
+   wg1.Wait()
+}
+```
+
+![channel-and-goroutines](https://img.draveness.me/2020-01-28-15802171487080-channel-and-goroutines.png)
+
+上述两个 Goroutine，一个会向 Channel 中发送数据，另一个会从 Channel 中接收数据，它们两者能够**独立运行**并不存在直接关联，但是能通过 Channel 间接完成通信
+
+### 有缓冲通道
+
+**顺利执行**
+
+```go
+//有缓冲区的通道
+var b2 chan int
+func main() {
+   fmt.Println(b2)
+   b2 = make(chan int, 2)
+   b2 <- 10
+   fmt.Println("10发送到通道中了")
+   b2 <- 20
+   fmt.Println("20发送到通道中了")
+   x := <-b2
+   fmt.Println("从通道b中接收到了", x)
+}
+```
 
 ## 进程、线程、协程
 
@@ -420,7 +645,7 @@ gomaxprocs（6）默认cpu的逻辑核心数，默认跑满整个CPU
 1. 一个进程中至少有一个线程，不然就没有存在的意义
 2. 在一个进程内部，要同时干多件事情，就需要同时运行多个子任务，我们把进程内的这些子任务叫做线程
 3. 多线程就是为了同步完成多项任务(在单个程序中同时运行多个线程完成不同的任务和工作)，不是为了提高运行效率，而是为了提高资源使用效率来提高系统的效率
-4. 一个简单的比喻，多线程就像是火车上的每节车厢，而进程就是火车
+4. 一个简单的比喻，多线程就像是火车上的每节车厢，而进程就是火车。
 5. 线程是程序执行流的最小单元。一个标准的线程由当前的线程ID、当前指令指针、寄存器和堆栈组成
 6. 同一个进程中的多个线程之间可以并发执行
 
