@@ -633,6 +633,155 @@ func main() {
 }
 ```
 
+### 习题2
+
+```go
+//使用 goroutine 和 channel 实现一个计算int64随机数各位数和的程序，例如生成随机数61345，计算其每个位数上的数字之和为19。
+//开启一个 goroutine 循环生成int64类型的随机数，发送到jobChan
+//开启24个 goroutine 从jobChan中取出随机数计算各位数的和，将结果发送到resultChan
+//主 goroutine 从resultChan取出结果并打印到终端输出
+
+type job struct {
+   value int64
+}
+type result struct {
+   job *job
+   sum int64
+}
+
+var jobChan = make(chan *job, 100)
+var resultChan = make(chan *result, 100)
+var wg sync.WaitGroup
+
+func f1(z1 chan<- *job) {
+   defer wg.Done()
+   //循环生成int64类型的随机数，发送到jobChan中
+   for {
+      x := rand.Int63()
+      newJob := &job{
+         value: x,
+      }
+      z1 <- newJob
+      time.Sleep(time.Millisecond * 500)
+   }
+}
+func f2(z1 <-chan *job, resultChan chan<- *result) {
+   defer wg.Done()
+   for {
+      job := <-z1
+      sum := int64(0)
+      n := job.value
+      for n > 0 {
+         sum += n % 10
+         n = n / 10
+      }
+      newResult := &result{
+         job: job,
+         sum: sum,
+      }
+      resultChan <- newResult
+   }
+}
+func main() {
+   wg.Add(1)
+   go f1(jobChan)
+   wg.Add(24)
+   for i := 0; i < 24; i++ {
+      go f2(jobChan, resultChan)
+   }
+   for result := range resultChan {
+      fmt.Printf("value %d  sum %d\n", result.job.value, result.sum)
+   }
+   wg.Wait()
+}
+```
+
+### select多路复用
+
+- 可处理一个或多个 channel 的发送/接收操作。
+- 如果多个 case 同时满足，select 会**随机**选择一个执行。
+- 对于没有 case 的 select 会一直阻塞，可用于阻塞 main 函数，防止退出。
+
+- - - - - - - - - - - - - - - - - - - 
+
+### 互斥锁
+
+#### 普通互斥锁
+
+互斥锁是一种常用的控制共享资源访问的方法，它能够保证同一时间只有一个 goroutine 可以访问共享资源
+
+```go
+var x = 0
+var wg sync.WaitGroup
+var lock sync.Mutex //互斥锁
+func add() {
+   defer wg.Done()
+   for i := 0; i < 10000; i++ {
+      //修改之前加锁
+      lock.Lock()
+      x += 1
+      //修改完成后解锁
+      lock.Unlock()
+   }
+}
+func main() {
+   wg.Add(2)
+   go add()
+   go add()
+   wg.Wait()
+   fmt.Println(x)
+}
+```
+
+**问题**：读网页和写网页的时候都加互斥锁将变得非常慢
+
+#### 读写互斥锁
+
+读写锁分为两种：读锁和写锁。当一个 goroutine 获取到读锁之后，其他的 goroutine 如果是获取读锁会继续获得锁，如果是获取写锁就会等待；而当一个 goroutine 获取写锁之后，其他的 goroutine 无论是获取读锁还是写锁都会等待。
+
+**应用场景**：读的次数远远大于写的次数
+
+```go
+var wg1 sync.WaitGroup
+var lo sync.Mutex
+var rw sync.RWMutex
+var y = 0
+
+func read() {
+   defer wg1.Done()
+   //lo.Lock()
+   rw.RLock()
+   fmt.Println(y)
+   time.Sleep(time.Millisecond)
+   //lo.Unlock()
+   rw.RUnlock()
+}
+func write() {
+   defer wg1.Done()
+   // lo.Lock()
+   rw.RLock()
+   y = y + 1
+   time.Sleep(time.Millisecond * 5)
+   //lo.Unlock()
+   rw.RUnlock()
+}
+func main() {
+   now := time.Now()
+   for i := 0; i < 10; i++ {
+      wg1.Add(1)
+      go write()
+   }
+   time.Sleep(time.Second)
+   for i := 0; i < 1000; i++ {
+      wg1.Add(1)
+      go read()
+   }
+   wg1.Wait()
+   tsub := time.Now().Sub(now)
+   fmt.Println(tsub)
+}
+```
+
 ## 进程、线程、协程
 
 \* [进程(process):](#进程process)

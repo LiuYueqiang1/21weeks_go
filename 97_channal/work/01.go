@@ -16,52 +16,54 @@ type job struct {
 	value int64
 }
 type result struct {
-	job *job
 	sum int64
+	job *job
 }
 
-var jobChan = make(chan *job, 100)
-var resultChan = make(chan *result, 100)
 var wg sync.WaitGroup
 
-func f1(z1 chan<- *job) {
+func f1(jobChan chan<- *job) {
 	defer wg.Done()
-	//循环生成int64类型的随机数，发送到jobChan中
 	for {
 		x := rand.Int63()
 		newJob := &job{
 			value: x,
 		}
-		z1 <- newJob
-		time.Sleep(time.Millisecond * 500)
+		jobChan <- newJob
+		time.Sleep(time.Second)
 	}
 }
-func f2(z1 <-chan *job, resultChan chan<- *result) {
+func f2(jobChan <-chan *job, resultChan chan<- *result) {
 	defer wg.Done()
+
 	for {
-		job := <-z1
-		sum := int64(0)
-		n := job.value
-		for n > 0 {
-			sum += n % 10
-			n = n / 10
+		n := <-jobChan
+		nv := n.value
+		//fmt.Println(nv)
+		var sum = int64(0)
+		for nv > 0 {
+			sum = nv%10 + sum
+			nv = nv / 10
 		}
-		newResult := &result{
-			job: job,
+		x := &result{
 			sum: sum,
+			job: n,
 		}
-		resultChan <- newResult
+		resultChan <- x
+
 	}
 }
 func main() {
+	var jobChan = make(chan *job, 100)
+	var resultChan = make(chan *result, 100)
 	wg.Add(1)
 	go f1(jobChan)
 	wg.Add(24)
-	for i := 0; i < 24; i++ {
+	for i := 1; i <= 24; i++ {
 		go f2(jobChan, resultChan)
 	}
 	for result := range resultChan {
-		fmt.Printf("value %d  sum %d\n", result.job.value, result.sum)
+		fmt.Printf("随机数为 %d ,和为 %d\n", result.job.value, result.sum)
 	}
 	wg.Wait()
 }
