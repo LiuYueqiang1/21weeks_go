@@ -521,6 +521,118 @@ func main() {
 }
 ```
 
+### chananl练习题
+
+```go
+var wg2 sync.WaitGroup
+
+func f1(ch1 chan int) {
+   defer wg2.Done()
+   for i := 0; i < 100; i++ {
+      ch1 <- i
+   }
+   close(ch1)
+}
+func f2(ch1, ch2 chan int) {
+   defer wg2.Done()
+   for {
+      x, ok := <-ch1
+      if !ok {
+         break
+      }
+      ch2 <- x * x
+   }
+   close(ch2)
+}
+func main() {
+   a := make(chan int, 100)
+   b := make(chan int, 100)
+   wg2.Add(2)
+   go f1(a)
+   go f2(a, b)
+   wg2.Wait()
+   for ret := range b {
+      fmt.Println(ret)
+   }
+}
+```
+
+### 单向通道
+
+多用于函数的参数里
+
+```go
+var wg2 sync.WaitGroup
+var once sync.Once
+
+func f1(ch1 chan <- int) { //只能向通道ch1里放值
+   wg2.Done()
+   for i := 0; i < 100; i++ {
+      ch1 <- i
+   }
+   close(ch1)
+}
+func f2(ch1 <- chan int, ch2 chan <- int) { //只能从ch1里取值，只能向ch2放值
+   wg2.Done()
+   for {
+      x, ok := <-ch1
+      if !ok {
+         break
+      }
+      ch2 <- x * x
+   }
+   once.Do(func() { close(ch2) }) //确保某个操作只执行一次
+}
+
+func main() {
+   a := make(chan int, 100)
+   b := make(chan int, 100)
+   wg2.Add(3)
+   go f1(a)
+   go f2(a, b)
+   go f2(a, b)
+   wg2.Wait()
+   for ret := range b {
+      fmt.Println(ret)
+   }
+}
+```
+
+<img src="https://www.liwenzhou.com/images/Go/concurrence/channel.png" alt="img" style="zoom:120%;" />
+
+nil：代表通道没有初始化
+
+关闭成功后将数据读取完，继续读取将返回0值
+
+三个goroutine开启5个通道
+
+```go
+func worker(id int, jobs <-chan int, results chan<- int) {
+	for j := range jobs {
+		fmt.Printf("worker:%d start job:%d\n", id, j)
+		time.Sleep(time.Second)
+		fmt.Printf("worker:%d end job:%d\n", id, j)
+		results <- j * 2
+	}
+}
+func main() {
+	jobs := make(chan int, 100)
+	results := make(chan int, 100)
+	//开启3个goroutine
+	for w := 1; w <= 3; w++ {
+		go worker(w, jobs, results)
+	}
+	//5个任务
+	for j := 1; j <= 5; j++ {
+		jobs <- j
+	}
+	close(jobs)
+	for a := 1; a <= 5; a++ {
+		<-results
+	}
+}
+```
+
 ## 进程、线程、协程
 
 \* [进程(process):](#进程process)
