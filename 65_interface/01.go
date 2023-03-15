@@ -29,6 +29,16 @@ func main() {
 	var d1 dog
 	d1.name = "大黄"
 	var c1 cat
+	//定义一个函数，传入一个接口，调用函数实现这个方法
 	da(d1) //大黄会汪汪汪~
 	da(c1) //喵喵喵~
+	//将结构体传入接口，用接口实现方法
+	var s1 speaker
+	s1 = d1
+	s1.speak()
+	s1 = c1
+	s1.speak()
+	//直接用结构体实现方法
+	d1.speak()
+	c1.speak()
 }

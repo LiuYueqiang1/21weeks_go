@@ -989,30 +989,44 @@ type 接口类型名 interface{
 
 ```go
 type dog struct {
-   name string
+	name string
 }
 type cat struct {
-   name string
+	name string
 }
+
 // 方法
 func (d dog) speak() {
-   fmt.Printf("%v会汪汪汪~\n", d.name)
+	fmt.Printf("%v会汪汪汪~\n", d.name)
 }
 func (c cat) speak() {
-   fmt.Println(("喵喵喵~"))
+	fmt.Println(("喵喵喵~"))
 }
+
 type speaker interface { //接口是一种类型
-   speak() //接收到了什么方法
+	speak() //接收到了什么方法
 }
+
 func da(x speaker) { //定义了一个名为da的函数，传入了一个变量，变量类型为接口类型
-   x.speak() //这个接口类型的变量做了什么方法
+	x.speak() //这个接口类型的变量做了什么方法
 }
+
 func main() {
-   var d1 dog
-   d1.name = "大黄"
-   var c1 cat
-   da(d1) //大黄会汪汪汪~
-   da(c1) //喵喵喵~
+	var d1 dog
+	d1.name = "大黄"
+	var c1 cat
+	//定义一个函数，传入一个接口，调用函数实现这个方法
+	da(d1) //大黄会汪汪汪~
+	da(c1) //喵喵喵~
+	//将结构体传入接口，用接口实现方法
+	var s1 speaker
+	s1 = d1
+	s1.speak()
+	s1 = c1
+	s1.speak()
+	//直接用结构体实现方法
+	d1.speak()
+	c1.speak()
 }
 ```
 
@@ -1062,12 +1076,6 @@ func main() {
 ### 接口的实现
 
  一个变量如果实现了接口中规定的所有方法，那么这个变量就实现了这个接口，可以成为这个接口类型的变量。
-
-![image-20230306210501889](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306210501889.png)
-
-![image-20230306210629310](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306210629310.png)
-
-![image-20230306210645657](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230306210645657.png)
 
 ```go
 // 接口的实现
@@ -1268,7 +1276,21 @@ func main() {
 
 ### init()
 
-![image-20230307163601366](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230307163601366.png)
+包的路径从 GOPATH/src后面的路径开始邪气，路径分隔符用/
+
+想被别的包调用的标识符首字母要大写
+
+单行导入和多行导入
+
+导入包的时候可以指定别名
+
+导入包不像被使用包内部的标识符，需要使用匿名导入
+
+每个包导入的时候会自动执行它的init（）函数，没有参数也没有返回值，不能被手动调用
+
+如果多个包都定义了init（）函数，则执行 顺序如下：
+
+![包初始化函数执行顺序示意图](https://www.liwenzhou.com/images/Go/package/package01.png)
 
 ## 作业
 
@@ -1624,3 +1646,86 @@ func main() {
 
 ## Time包
 
+time.Now()：返回本地时间
+
+tine.Unix()：返回时间戳
+
+```go
+func Unix(sec int64, nsec int64) Time
+```
+
+
+Unix返回自UTC 1970年1月1日起对应于给定Unix时间的本地时间，sec秒和nsec纳秒。在[0,999999999]范围之外传递nsec是有效的。不是所有的sec值都有相应的时间值。其中一个值是1<<63-1(最大的int64值)。
+
+```go
+func timetest() {
+   nowTime := time.Now()
+   fmt.Println(nowTime)
+   fmt.Println(nowTime.Year())
+   fmt.Println(nowTime.Month())
+   fmt.Println(nowTime.Day())
+   fmt.Println(nowTime.Hour())
+   fmt.Println(nowTime.Minute())
+   fmt.Println(nowTime.Second()) //秒
+   time1 := nowTime.Unix()       //时间戳  1678886446
+   time2 := nowTime.UnixNano()   //纳秒时间戳  1678886446424576900
+   fmt.Println(time1, time2)
+   a1 := time.Unix(1678886401, 0)
+   fmt.Println(a1) //根据时间戳查看时间  2023-03-15 21:20:01 +0800 CST
+}
+```
+
+时间戳：
+
+```go
+func timestampDemo() {
+   now := time.Now()
+   fmt.Println(now) //2023-03-09 20:12:21.3150337 +0800 CST m=+0.007772701
+   tafter_hour := now.Add(time.Hour)  //加一个小时
+   fmt.Println(tafter_hour)     //2023-03-09 21:12:21.3150337 +0800 CST m=+3600.007772701
+   timeunix := now.Unix()       //微秒时间戳
+   timemilli := now.UnixMilli() //毫秒时间戳
+   timemicro := now.UnixMicro() //微秒时间戳
+   timenano := now.UnixNano()   //纳秒时间戳
+   fmt.Println(timeunix, timemilli, timemicro, timenano)
+}
+```
+
+time.Tick定时器 
+
+```go
+func Tick(d Duration) <-chan Time
+//返回值<-chan Time
+```
+
+Tick的类型：<-chan time.Time
+
+```go
+// 定时器
+// 使用time.Tick(时间间隔)来设置定时器，定时器的本质上是一个通道（channel）
+func tickDemo() {
+   ticker := time.Tick(time.Second)
+   for i := range ticker {
+      fmt.Printf("%T\n", ticker) //<-chan time.Time
+      fmt.Println(i)             //每秒都会执行的任务
+   }
+}
+```
+
+time.Format：按照指定格式输出时间
+
+```go
+func (t Time) Format(layout string) string
+```
+
+```go
+func fomatdemo() {
+   nowTime := time.Now()
+   ret1 := nowTime.Format("2006-01-02 15:04:05.000 Mon Jan")
+   fmt.Println(ret1)
+   ret2 := nowTime.Format("2006-01-02 03:04:05.000 PM Mon Jan")
+   fmt.Println(ret2)
+   fmt.Println(nowTime.Format("2006-01-02"))
+   fmt.Println(nowTime.Format("15:04:05"))
+}
+```

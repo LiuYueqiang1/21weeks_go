@@ -17,7 +17,7 @@ func timetest() {
 	time1 := nowTime.Unix()       //时间戳
 	time2 := nowTime.UnixNano()   //纳秒时间戳
 	fmt.Println(time1, time2)
-	a1 := time.Unix(1678361905, 0)
+	a1 := time.Unix(1678886401, 0)
 	fmt.Println(a1) //根据时间戳查看时间
 }
 func timezoneDemo() {
@@ -32,13 +32,13 @@ func timezoneDemo() {
 // 时间戳
 func timestampDemo() {
 	now := time.Now()
-	fmt.Println(now) //2023-03-09 20:12:21.3150337 +0800 CST m=+0.007772701
-	tafter_hour := now.Add(time.Hour)
-	fmt.Println(tafter_hour)     //2023-03-09 21:12:21.3150337 +0800 CST m=+3600.007772701
-	timeunix := now.Unix()       //微秒时间戳
-	timemilli := now.UnixMilli() //毫秒时间戳
-	timemicro := now.UnixMicro() //微秒时间戳
-	timenano := now.UnixNano()   //纳秒时间戳
+	fmt.Println(now)                  //2023-03-09 20:12:21.3150337 +0800 CST m=+0.007772701
+	tafter_hour := now.Add(time.Hour) //加一个小时
+	fmt.Println(tafter_hour)          //2023-03-09 21:12:21.3150337 +0800 CST m=+3600.007772701
+	timeunix := now.Unix()            //微秒时间戳
+	timemilli := now.UnixMilli()      //毫秒时间戳
+	timemicro := now.UnixMicro()      //微秒时间戳
+	timenano := now.UnixNano()        //纳秒时间戳
 	fmt.Println(timeunix, timemilli, timemicro, timenano)
 }
 
@@ -52,9 +52,9 @@ func timestamp2Time() {
 // 使用time.Tick(时间间隔)来设置定时器，定时器的本质上是一个通道（channel）
 func tickDemo() {
 	ticker := time.Tick(time.Second)
-
 	for i := range ticker {
-		fmt.Println(i) //每秒都会执行的任务
+		fmt.Printf("%T\n", ticker) //<-chan time.Time
+		fmt.Println(i)             //每秒都会执行的任务
 	}
 }
 
@@ -108,12 +108,13 @@ func main() {
 	//timetest()
 	//timezoneDemo()
 	//timestampDemo()
-	//fomatdemo()
-	parseDemo2()
-	n := 5
-	fmt.Println("开始sleep")
-	time.Sleep(time.Duration(n) * time.Second)
-	fmt.Println("5秒钟过去了")
-	time.Sleep(2 * time.Second)
-	fmt.Println("又2秒钟过去了")
+	fomatdemo()
+	//tickDemo()
+	//parseDemo2()
+	//n := 5
+	//fmt.Println("开始sleep")
+	//time.Sleep(time.Duration(n) * time.Second)
+	//fmt.Println("5秒钟过去了")
+	//time.Sleep(2 * time.Second)
+	//fmt.Println("又2秒钟过去了")
 }
