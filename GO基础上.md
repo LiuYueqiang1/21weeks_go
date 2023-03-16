@@ -1377,7 +1377,8 @@ func readfromRead() {
    //读文件
    var tmp = make([]byte, 128) //读取指定长度
    for {
-       n, err := fileObj.Read(tmp)//文件名.Read(写入到tmp中)，tmp是一个切片
+       n, err := fileObj.Read(tmp)//从文件fileObj中读取n个字节并将读取到的内容存储在tmp中
+       //文件名.Read(写入到tmp中)，tmp是一个切片
       //func (f *File) Read(b []byte) (n int, err error)
       //Read是一个方法，*File是接收者，读文件*file，写入到b中，返回一个读到的数量n的和一个错误
       if err == io.EOF {
@@ -1425,9 +1426,10 @@ func readfrombufio() {
    defer fileObj.Close()
    //按行读取文件
    //创建一个用来从文件中读取内容的对象
-   reader := bufio.NewReader(fileObj)
-   for {
-      line, err := reader.ReadString('\n')
+   // reader := bufio.NewReader(os.Stdin) 读取的是从命令行输入的值
+   reader := bufio.NewReader(fileObj)//读取文件并存入缓冲区
+   for { //for循环在这里，从读文件开始循环，不能从读取文件开始，这样的话每次都会重新读
+      line, err := reader.ReadString('\n')//从缓冲区中读文件，读到'\n'结束
       if err == io.EOF {
          fmt.Println("文件读取完毕")
          return
@@ -1449,6 +1451,7 @@ func readfrombufio() {
 
 ```go
 func readFromFileByIouttil() {
+    //直接读取整个文件，不过不要忘记ret为byte[]类型，打印时需要转化为string类型
    ret, err := ioutil.ReadFile("F:\\goland\\go_project\\21weeks_go\\71_file\\01.go")
    if err != nil {
       fmt.Printf("文件读取错误，%v\n", err)

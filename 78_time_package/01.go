@@ -108,9 +108,9 @@ func main() {
 	//timetest()
 	//timezoneDemo()
 	//timestampDemo()
-	fomatdemo()
+	//fomatdemo()
 	//tickDemo()
-	//parseDemo2()
+	parseDemo2()
 	//n := 5
 	//fmt.Println("开始sleep")
 	//time.Sleep(time.Duration(n) * time.Second)
