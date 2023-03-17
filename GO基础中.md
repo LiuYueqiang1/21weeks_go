@@ -74,9 +74,35 @@ mylogger.go
 
 consloe.go：
 
-![image-20230310112709204](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230310112709204.png)
+```go
+//向终端写日志
 
-![image-20230310112732547](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230310112732547.png)
+// 定义Logger结构体
+type Logger struct {
+}
+
+// 给Logger建立构造函数去调用Logger
+func Newlog() Logger {
+   return Logger{}
+}
+
+// 给Logger定义一系列方法
+func (l Logger) Debug(msg string) {
+   fmt.Println(msg)
+}
+func (l Logger) Info(msg string) {
+   fmt.Println(msg)
+}
+func (l Logger) Warning(msg string) {
+   fmt.Println(msg)
+}
+func (l Logger) Error(msg string) {
+   fmt.Println(msg)
+}
+func (l Logger) Fatal(msg string) {
+   fmt.Println(msg)
+}
+```
 
 Fprint：往指定位置写
 
@@ -84,7 +110,183 @@ Fprint：往指定位置写
 
 mylogger_test：是
 
-![image-20230310112753309](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230310112753309.png)
+```go
+// 自定义一个日志库
+func main() {
+   log := mylogger.Newlog()
+   for {
+      log.Debug("这是一条Debug日志")
+      log.Info("这是一条Info日志")
+      log.Warning("这是一条Warning日志")
+      log.Error("这是一条Erroe日志")
+      log.Fatal("这是一条Fatal日志")
+      time.Sleep(time.Second)
+   }
+}
+```
+
+可以在终端输出
+
+在console中将时间打印出来
+
+```go
+// 给Logger定义一系列方法
+func (l Logger) Debug(msg string) {
+   now := time.Now()
+   TF := now.Format("2006-01-02 15:04:05")
+   fmt.Printf("[%s] %s\n", TF, msg)
+}
+func (l Logger) Info(msg string) {
+   now := time.Now()
+   TF := now.Format("2006-01-02 15:04:05")
+   fmt.Printf("[%s] %s\n", TF, msg)
+}
+func (l Logger) Warning(msg string) {
+   now := time.Now()
+   TF := now.Format("2006-01-02 15:04:05")
+   fmt.Printf("[%s] %s\n", TF, msg)
+}
+func (l Logger) Error(msg string) {
+   now := time.Now()
+   TF := now.Format("2006-01-02 15:04:05")
+   fmt.Printf("[%s] %s\n", TF, msg)
+}
+func (l Logger) Fatal(msg string) {
+   now := time.Now()
+   TF := now.Format("2006-01-02 15:04:05")
+   fmt.Printf("[%s] %s\n", TF, msg)
+}
+```
+
+3、日志要支持开关控制，比如说开发的时候什么级别都能输出，但是上线之后只有INFO级别往下的才能输出
+
+```go
+console.go
+// 给log分级别
+type LogLevel uint16 //这里必须是type，而不是var
+
+const (
+   DEBUG LogLevel = iota
+   TRACE
+   INFO
+   WARNING
+   ERROR
+   FATAL
+)
+
+// 定义Logger结构体
+type Logger struct {
+   Lever LogLevel
+}
+
+// 给Logger建立构造函数去调用Logger,传入LogLevel
+func Newlog(le LogLevel) Logger {
+   return Logger{}
+}
+
+```
+
+```
+mylogger.go
+
+log := mylogger.Newlog("Debug")
+```
+
+但是主函数调用的时候Newlog输入的是String类型
+
+所以需要将Newlog传入的改成这个
+
+```go
+
+// 给Logger建立构造函数去调用Logger
+func Newlog(levelStr string) Logger {
+   return Logger{}
+}
+```
+
+修改完成后的：
+
+```go
+//将构造函数里面string类型的转换为Logger类型
+func parseLogLevel(s string)(LogLevel,error){
+   s=strings.ToLower(s)
+   switch s {
+   case "debug":
+      return DEBUG,nil
+   case "trace"
+      return TRACE,nil
+   case "info":
+      return INFO,nil
+   case "warning":
+      return WARNING,nil
+   case "error":
+      return ERROR,nil
+   case "fatal":
+      return FATAL,nil
+   default:
+      err:=errors.New("无效的日志级别")
+      return UNKNON , err
+   }
+}
+// 给Logger建立构造函数去调用Logger
+func Newlog(levelStr string) Logger {
+   level,err:=parseLogLevel(levelStr)  //输入一个String类型的，返回一个Loglevel类型的
+   if err!=nil{
+      panic(err)
+   }
+   return Logger{
+      Lever: level,
+   }
+}
+```
+
+将只要大于传入的日志级别输出
+
+```go
+func (l Logger) enable(loglevel LogLevel) bool {
+   return loglevel >= l.Lever    //l.Lever：写入的
+}
+
+// 给Logger定义一系列方法
+func (l Logger) Debug(msg string) {
+   if l.enable(DEBUG) {
+      now := time.Now()
+      TF := now.Format("2006-01-02 15:04:05")
+      fmt.Printf("[%s] [DEBUG] %s\n", TF, msg)
+   }
+
+}
+
+func (l Logger) Info(msg string) {
+   if l.enable(INFO) {
+      now := time.Now()
+      TF := now.Format("2006-01-02 15:04:05")
+      fmt.Printf("[%s] [INFO] %s\n", TF, msg)
+   }
+}
+func (l Logger) Warning(msg string) {
+   if l.enable(WARNING) {
+      now := time.Now()
+      TF := now.Format("2006-01-02 15:04:05")
+      fmt.Printf("[%s] [WARNING] %s\n", TF, msg)
+   }
+}
+func (l Logger) Error(msg string) {
+   if l.enable(ERROR) {
+      now := time.Now()
+      TF := now.Format("2006-01-02 15:04:05")
+      fmt.Printf("[%s] [ERROR] %s\n", TF, msg)
+   }
+
+}
+func (l Logger) Fatal(msg string) {
+   if l.enable(FATAL) {
+      now := time.Now()
+      TF := now.Format("2006-01-02 15:04:05")
+      fmt.Printf("[%s] [FATAL] %s\n", TF, msg)
+   }
+}
+```
 
 ## 87 反射
 
