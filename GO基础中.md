@@ -288,6 +288,279 @@ func (l Logger) Fatal(msg string) {
 }
 ```
 
+写出main()里面日志的文件名，函数名，行号
+
+```go
+// 执行的哪一行
+// runtime 做程序运行时垃圾回收的操作，记录堆栈信息，函数调用，执行的什么文件
+// pc调用的哪个函数
+// file谁调用的这个函数
+// 调用此函数的行号
+func getInfo(skip int) (funcName, fileName string, lineNo int) {
+   pc, file, lineNo, ok := runtime.Caller(skip)
+   if !ok {
+      fmt.Println("runtime.Caller() failed")
+      return
+   }
+   funcName = runtime.FuncForPC(pc).Name()
+   fileName = path.Base(file)
+   return
+}
+```
+
+将方法更新
+
+```go
+// 给Logger定义一系列方法
+func (l Logger) Debug(msg string) {
+   if l.enable(DEBUG) {
+      funcName, fileName, lineNo := getInfo(2)
+      now := time.Now()
+      TF := now.Format("2006-01-02 15:04:05")
+      fmt.Printf("[%s] [DEBUG] [%s:%s:%d] %s\n", TF, funcName, fileName, lineNo, msg)
+   }
+}
+```
+
+定义一个函数记录日志，将方法简化
+
+```go
+// 写一个记日志的函数
+func log(lv LogLevel, msg string) {
+   now := time.Now()
+   TF := now.Format("2006-01-02 15:04:05")
+   funcName, fileName, lineNo := getInfo(3)
+   fmt.Printf("[%s] [DEBUG] [%s:%s:%d] %s\n", TF, funcName, fileName, lineNo, msg)
+}
+//此时的[DEBUG]需要在每个函数中声明
+//传进来的是一个LogLevel类型，输出的应该是一个String类型
+
+// 给Logger定义一系列方法
+func (l Logger) Debug(msg string) {
+   if l.enable(DEBUG) {
+      log(DEBUG, msg)
+   }
+}
+
+func (l Logger) Info(msg string) {
+   if l.enable(INFO) {
+      log(INFO, msg)
+   }
+}
+func (l Logger) Warning(msg string) {
+   if l.enable(WARNING) {
+      log(WARNING, msg)
+   }
+}
+func (l Logger) Error(msg string) {
+   if l.enable(ERROR) {
+      log(ERROR, msg)
+   }
+
+}
+func (l Logger) Fatal(msg string) {
+   if l.enable(FATAL) {
+      log(FATAL, msg)
+   }
+}
+```
+
+将每个输出时的[错误]类型按照字符串输出，（原本是LogLevel类型）
+
+```go
+//F:\goland\go_project\21weeks\21weeks_go\82_test_rizhiku\mylogger\mylogger.go
+func getLogString(lv LogLevel) string {
+   switch lv {
+   case DEBUG:
+      return "DEBUG"
+   case TRACE:
+      return "TRACE"
+   case INFO:
+      return "INFO"
+   case WARNING:
+      return "WARNING"
+   case ERROR:
+      return "ERROR"
+   case FATAL:
+      return "FATAL"
+   }
+   return "DEBUG"
+}
+```
+
+```go
+// 修改记日志的函数
+func log(lv LogLevel, msg string) {
+   now := time.Now()
+   TF := now.Format("2006-01-02 15:04:05")
+   funcName, fileName, lineNo := getInfo(3)
+   fmt.Printf("[%s] [%s] [文件名:%s 函数名:%s 行号:%d] %s\n", TF, getLogString(lv), fileName, funcName, lineNo, msg)
+}
+```
+
+在main函数中输入的不只是String类型，输入的是任意类型
+
+```go
+//参考：
+func Printf(format string, a ...any) (n int, err error) {
+   return Fprintf(os.Stdout, format, a...)
+}
+//有格式化的语句，则传变量，没有格式化的语句，后面不传也可以
+type any interface{}
+```
+
+后面的改动：
+
+```go
+// 写一个记日志的函数
+func log(lv LogLevel, format string, a ...interface{}) {
+   msg := fmt.Sprintf(format, a...) //Sprintf根据格式说明符格式化并返回结果字符串
+   now := time.Now()
+   TF := now.Format("2006-01-02 15:04:05")
+   funcName, fileName, lineNo := getInfo(3)
+   fmt.Printf("[%s] [%s] [文件名:%s 函数名:%s 行号:%d] %s\n", TF, getLogString(lv), fileName, funcName, lineNo, msg)
+}
+// 给Logger定义一系列方法
+func (l Logger) Debug(format string, a ...interface{}) {
+   if l.enable(DEBUG) {
+      log(DEBUG, format, a...)
+   }
+}
+func (l Logger) Info(format string, a ...interface{}) {
+   if l.enable(INFO) {
+      log(INFO, format, a...)
+   }
+}
+func (l Logger) Warning(format string, a ...interface{}) {
+   if l.enable(WARNING) {
+      log(WARNING, format, a...)
+   }
+}
+func (l Logger) Error(format string, a ...interface{}) {
+   if l.enable(ERROR) {
+      log(ERROR, format, a...)
+   }
+
+}
+func (l Logger) Fatal(format string, a ...interface{}) {
+   if l.enable(FATAL) {
+      log(FATAL, format, a...)
+   }
+}
+```
+
+输出到文件中
+
+将写日志的函数改为写日志的方法
+
+```go
+// 写一个记日志的方法
+func (c ConsoleLogger) log(lv LogLevel, format string, a ...interface{}) {
+   if c.enable(lv) {
+      msg := fmt.Sprintf(format, a...) //Sprintf根据格式说明符格式化并返回结果字符串
+      now := time.Now()
+      TF := now.Format("2006-01-02 15:04:05")
+      funcName, fileName, lineNo := getInfo(3)
+      fmt.Printf("[%s] [%s] [文件名:%s 函数名:%s 行号:%d] %s\n", TF, getLogString(lv), fileName, funcName, lineNo, msg)
+   }
+}
+```
+
+新建一个file文件
+
+```go
+// 往文件里面写代码
+type FileLogger struct {
+   Level       LogLevel
+   filePath    string
+   fileName    string
+   fileObj     *os.File
+   errFileObj  *os.File
+   maxFileSize int64
+}
+// FileLogger 的构造函数
+func NewFileLogger(levelStr, fp, fn string, maxSize int64) *FileLogger {
+   logLevel, err := parseLogLevel(levelStr)
+   if err != nil {
+      panic(err)
+   }
+   f1 := &FileLogger{
+      Level:       logLevel,
+      filePath:    fp,
+      fileName:    fn,
+      maxFileSize: maxSize,
+   }
+   err = f1.initFile() //按照文件路径和文件名将文件打开
+   if err != nil {
+      panic(err)
+   }
+   return f1
+}
+func (f *FileLogger) initFile() error {
+   fullFileName := path.Join(f.filePath, f.fileName)
+   fileObj, err := os.OpenFile(fullFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+   if err != nil {
+      fmt.Printf("open log file dailed,err:%v\n", err)
+      return err
+   }
+   errfileObj, err := os.OpenFile(fullFileName+".err", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+   if err != nil {
+      fmt.Printf("open err log file dailed,err:%v\n", err)
+      return err
+   }
+   //日志文件已打开
+   f.fileObj = fileObj
+   f.errFileObj = errfileObj
+   return nil
+}
+// 写一个记日志的方法
+func (f *FileLogger) log(lv LogLevel, format string, a ...interface{}) {
+   if f.enable(lv) {
+      msg := fmt.Sprintf(format, a...) //Sprintf根据格式说明符格式化并返回结果字符串
+      now := time.Now()
+      TF := now.Format("2006-01-02 15:04:05")
+      funcName, fileName, lineNo := getInfo(3)
+      fmt.Fprintf(f.fileObj, "[%s] [%s] [文件名:%s 函数名:%s 行号:%d] %s\n", TF, getLogString(lv), fileName, funcName, lineNo, msg)
+      if lv >= ERROR {
+         //如果要记录的日志大于等于ERROR级别，还需要再err日志中再记录一遍
+         fmt.Fprintf(f.errFileObj, "[%s] [%s] [文件名:%s 函数名:%s 行号:%d] %s\n", TF, getLogString(lv), fileName, funcName, lineNo, msg)
+      }
+   }
+}
+// 写一个记日志的函数
+func (f *FileLogger) enable(loglevel LogLevel) bool {
+   return loglevel >= f.Level //f.Lever：写入的
+}
+// 给Logger定义一系列方法
+func (f *FileLogger) Debug(format string, a ...interface{}) {
+   f.log(DEBUG, format, a...)
+}
+func (f *FileLogger) Info(format string, a ...interface{}) {
+   f.log(INFO, format, a...)
+}
+func (f *FileLogger) Warning(format string, a ...interface{}) {
+   f.log(WARNING, format, a...)
+}
+func (f *FileLogger) Error(format string, a ...interface{}) {
+   f.log(ERROR, format, a...)
+}
+func (f *FileLogger) Fatal(format string, a ...interface{}) {
+   f.log(FATAL, format, a...)
+}
+
+func (f *FileLogger) Close() {
+   f.fileObj.Close()
+   f.errFileObj.Close()
+}
+```
+
+在main函数中调用存入文件的方法
+
+```go
+//log := mylogger.Newlog("Debug")
+log := mylogger.NewFileLogger("Info", "F:\\goland\\go_project\\21weeks\\21weeks_go\\82_test_rizhiku\\mylogger", "zhoulinwan.log", 10*1024*1024)
+```
+
 ## 87 反射
 
 **了解原理即可**
