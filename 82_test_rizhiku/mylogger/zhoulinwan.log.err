@@ -28,3 +28,17 @@
 [2023-03-17 20:45:28] [FATAL] [文件名:mylogger.go 函数名:main 行号:19] 这是一条Fatal日志
 [2023-03-17 20:45:29] [ERROR] [文件名:mylogger.go 函数名:main 行号:18] 这是一条Error日志,id:10010,name:米栗木
 [2023-03-17 20:45:29] [FATAL] [文件名:mylogger.go 函数名:main 行号:19] 这是一条Fatal日志
+[2023-03-17 22:33:37] [ERROR] [文件名:mylogger.go 函数名:main 行号:18] 这是一条Error日志,id:10010,name:米栗木
+[2023-03-17 22:33:37] [FATAL] [文件名:mylogger.go 函数名:main 行号:19] 这是一条Fatal日志
+[2023-03-17 22:33:38] [ERROR] [文件名:mylogger.go 函数名:main 行号:18] 这是一条Error日志,id:10010,name:米栗木
+[2023-03-17 22:33:38] [FATAL] [文件名:mylogger.go 函数名:main 行号:19] 这是一条Fatal日志
+[2023-03-17 22:33:39] [ERROR] [文件名:mylogger.go 函数名:main 行号:18] 这是一条Error日志,id:10010,name:米栗木
+[2023-03-17 22:33:39] [FATAL] [文件名:mylogger.go 函数名:main 行号:19] 这是一条Fatal日志
+[2023-03-17 22:33:40] [ERROR] [文件名:mylogger.go 函数名:main 行号:18] 这是一条Error日志,id:10010,name:米栗木
+[2023-03-17 22:33:40] [FATAL] [文件名:mylogger.go 函数名:main 行号:19] 这是一条Fatal日志
+[2023-03-17 22:33:41] [ERROR] [文件名:mylogger.go 函数名:main 行号:18] 这是一条Error日志,id:10010,name:米栗木
+[2023-03-17 22:33:41] [FATAL] [文件名:mylogger.go 函数名:main 行号:19] 这是一条Fatal日志
+[2023-03-17 22:33:42] [ERROR] [文件名:mylogger.go 函数名:main 行号:18] 这是一条Error日志,id:10010,name:米栗木
+[2023-03-17 22:33:42] [FATAL] [文件名:mylogger.go 函数名:main 行号:19] 这是一条Fatal日志
+[2023-03-17 22:33:43] [ERROR] [文件名:mylogger.go 函数名:main 行号:18] 这是一条Error日志,id:10010,name:米栗木
+[2023-03-17 22:33:43] [FATAL] [文件名:mylogger.go 函数名:main 行号:19] 这是一条Fatal日志

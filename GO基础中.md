@@ -561,6 +561,8 @@ func (f *FileLogger) Close() {
 log := mylogger.NewFileLogger("Info", "F:\\goland\\go_project\\21weeks\\21weeks_go\\82_test_rizhiku\\mylogger", "zhoulinwan.log", 10*1024*1024)
 ```
 
+判断fileObj，errFileObj的大小是否超过了最大值，写一个方法
+
 ## 87 反射
 
 **了解原理即可**

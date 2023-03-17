@@ -8,7 +8,7 @@ import (
 // 自定义一个日志库
 func main() {
 	//log := mylogger.Newlog("Debug")
-	log := mylogger.NewFileLogger("Info", "F:\\goland\\go_project\\21weeks\\21weeks_go\\82_test_rizhiku\\mylogger", "zhoulinwan.log", 10*1024*1024)
+	log := mylogger.NewFileLogger("Info", "F:\\goland\\go_project\\21weeks\\21weeks_go\\82_test_rizhiku\\mylogger", "zhoulinwan.log", 10*1024)
 	for {
 		log.Debug("这是一条Debug日志")
 		log.Info("这是一条Info日志")
