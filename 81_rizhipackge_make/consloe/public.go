@@ -40,3 +40,22 @@ func pardeLogLevel(s string) (LogLevel, error) {
 	}
 
 }
+
+// 将主函数中输入的LogLevel类型转换为String类型
+func getLogString(lv LogLevel) string {
+	switch lv {
+	case DEBUG:
+		return "DEBUG"
+	case TRACE:
+		return "TRACE"
+	case INFO:
+		return "INFO"
+	case WARNING:
+		return "WARNING"
+	case ERROR:
+		return "ERROR"
+	case FATAL:
+		return "FATAL"
+	}
+	return "DEBUG"
+}

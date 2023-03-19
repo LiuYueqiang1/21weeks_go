@@ -6,11 +6,11 @@ import (
 )
 
 func main() {
-	log := consloe.NewLog("Info")
+	log := consloe.NewLog("debug")
 	//	fmt.Println(log)  1
 	for {
 		log.Debug("这是一条Debug日志")
-		log.Info("这是一条Info日志")
+		log.Trace("这是一条Trace日志")
 		log.Info("这是一条Info日志")
 		log.Warning("这是一条Warning日志")
 		log.Error("这是一条Error日志")
