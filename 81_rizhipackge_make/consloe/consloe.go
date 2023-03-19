@@ -5,14 +5,14 @@ import (
 	"time"
 )
 
-// 日志结构体
+// Logger 结构体
 type Logger struct {
-	Level Loglevel
+	Level LogLevel
 }
 
-// Logger的构造函数，调用Logger结构体
+// NewLog 建立构造函数调用这个结构体
 func NewLog(levelStr string) Logger {
-	level, err := pardeLoglevel(levelStr)
+	level, err := pardeLogLevel(levelStr)
 	if err != nil {
 		panic(err)
 	}
@@ -21,42 +21,33 @@ func NewLog(levelStr string) Logger {
 	}
 }
 
-// 构造一个比较的方法
-func (l Logger) enable(logLevel Loglevel) bool {
-	return logLevel >= l.Level
-}
-
-func log(lv Loglevel, msg string) {
-	now := time.Now()
-	funcName, fileName, lineNo := getInfo(3)
-	fmt.Printf("[%s] [%s:%s:%s],%s\n", now.Format("2006-01-02 15:04:05"), funcName, fileName, lineNo, msg)
-}
+// 其实Level就是levelStr，只不过类型不一样，l.Level就是主函数里传入的
+// 给Logger定义一系列方法
 func (l Logger) Debug(msg string) {
-	if l.enable(DEBUG) {
+	if LogLevel(DEBUG) >= l.Level { //两个都是LogLevel类型的
 		now := time.Now()
-		fmt.Printf("[%s],%s\n", now.Format("2006-01-02 15:04:05"), msg)
+		TF := now.Format("2006-01-02 15:04:05")
+		fmt.Printf("[%s] %s\n", TF, msg)
 	}
+
 }
 func (l Logger) Info(msg string) {
-	if l.enable(INFO) {
-		log(INFO, msg)
-	}
+	now := time.Now()
+	TF := now.Format("2006-01-02 15:04:05")
+	fmt.Printf("[%s] %s\n", TF, msg)
 }
 func (l Logger) Warning(msg string) {
-	if l.enable(WARNING) {
-		now := time.Now()
-		fmt.Printf("[%s] ,%s\n", now.Format("2006-01-02 15:04:05"), msg)
-	}
-}
-func (l Logger) Error(msg string) {
-	if l.enable(ERROR) {
-		now := time.Now()
-		fmt.Printf("[%s],%s\n", now.Format("2006-01-02 15:04:05"), msg)
-	}
+	now := time.Now()
+	TF := now.Format("2006-01-02 15:04:05")
+	fmt.Printf("[%s] %s\n", TF, msg)
 }
 func (l Logger) Fatal(msg string) {
-	if l.enable(FATAL) {
-		now := time.Now()
-		fmt.Printf("[%s],%s\n", now.Format("2006-01-02 15:04:05"), msg)
-	}
+	now := time.Now()
+	TF := now.Format("2006-01-02 15:04:05")
+	fmt.Printf("[%s] %s\n", TF, msg)
+}
+func (l Logger) Error(msg string) {
+	now := time.Now()
+	TF := now.Format("2006-01-02 15:04:05")
+	fmt.Printf("[%s] %s\n", TF, msg)
 }
