@@ -19,5 +19,4 @@ func main() {
 		log.Fatal("这是一条Fatal日志")
 		time.Sleep(time.Second)
 	}
-
 }
