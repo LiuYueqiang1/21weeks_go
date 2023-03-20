@@ -2,6 +2,8 @@ package consloe
 
 import (
 	"fmt"
+	"path"
+	"runtime"
 	"time"
 )
 
@@ -28,11 +30,24 @@ func (l Logger) enable(loglevel LogLevel) bool {
 	return false
 }
 
+//查看执行的文件信息
+func getInfo(skip int) (funcName, fileName string, lineNo int) {
+	pc, file, lineNo, ok := runtime.Caller(skip)
+	if !ok {
+		fmt.Println("called is failed")
+		return
+	}
+	fileName = runtime.FuncForPC(pc).Name()
+	funcName = path.Base(file)
+	return
+}
+
 // 写一个记录日志的函数
 func log(lv LogLevel, msg string) {
+	funcName, fileName, lineNo := getInfo(3)
 	now := time.Now()
 	TF := now.Format("2006-01-02 15:04:05")
-	fmt.Printf("[%s] [%s] %s\n", TF, getLogString(lv), msg)
+	fmt.Printf("[%s] [%s] [文件名：%s 函数名：%s 行号：%d]%s\n", TF, getLogString(lv), fileName, funcName, lineNo, msg)
 }
 
 // 其实Level就是levelStr，只不过类型不一样，l.Level就是主函数里传入的
