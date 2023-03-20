@@ -53,7 +53,6 @@ func (l Logger) log(lv LogLevel, format string, a ...interface{}) {
 		TF := now.Format("2006-01-02 15:04:05")
 		fmt.Printf("[%s] [%s] [文件名：%s 函数名：%s 行号：%d]%s\n", TF, getLogString(lv), fileName, funcName, lineNo, msg)
 	}
-
 }
 
 //在主函数中输入的不仅是一个字符串类型的，而是可以输入任意信息

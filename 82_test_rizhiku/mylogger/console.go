@@ -13,7 +13,7 @@ type ConsoleLogger struct {
 }
 
 // 给Logger建立构造函数去调用Logger
-func Newlog(levelStr string) ConsoleLogger {
+func NewConsloelogger(levelStr string) ConsoleLogger {
 	level, err := parseLogLevel(levelStr) //输入一个String类型的，返回一个Loglevel类型的
 	if err != nil {
 		panic(err)

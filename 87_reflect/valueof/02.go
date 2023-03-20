@@ -20,9 +20,11 @@ func typeValue2(x interface{}) {
 }
 
 func main() {
-	var a int64 = 100
-	typeValue1(&a)
-	fmt.Println(a) //100
-	typeValue2(&a)
-	fmt.Println(a) //200
+	//var a int64 = 100
+	//typeValue1(a)
+	//fmt.Println(a)
+	var b int64 = 100
+	typeValue2(&b) //反射为传入地址
+	fmt.Println(b)
+
 }

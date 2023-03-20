@@ -68,9 +68,11 @@ func main() {
 
 go程序：
 
+#### 1、支持不同的地方输出日志
+
 mylogger.go
 
-测试自己写的日志库
+##### 测试自己写的日志库
 
 consloe.go：
 
@@ -106,7 +108,7 @@ func (l Logger) Fatal(msg string) {
 
 Fprint：往指定位置写
 
-往终端中写
+##### 往终端中写
 
 mylogger_test：是
 
@@ -127,7 +129,7 @@ func main() {
 
 可以在终端输出
 
-在console中将时间打印出来
+##### 在console中将时间打印出来
 
 ```go
 // 给Logger定义一系列方法
@@ -158,7 +160,9 @@ func (l Logger) Fatal(msg string) {
 }
 ```
 
-3、日志要支持开关控制，比如说开发的时候什么级别都能输出，但是上线之后只有INFO级别往下的才能输出
+#### 3、实现开关控制
+
+日志要支持开关控制，比如说开发的时候什么级别都能输出，但是上线之后只有INFO级别往下的才能输出
 
 ```go
 console.go
@@ -191,6 +195,8 @@ mylogger.go
 
 log := mylogger.Newlog("Debug")
 ```
+
+##### 建立构造函数调用Logger
 
 但是主函数调用的时候Newlog输入的是String类型
 
@@ -563,6 +569,34 @@ log := mylogger.NewFileLogger("Info", "F:\\goland\\go_project\\21weeks\\21weeks_
 
 判断fileObj，errFileObj的大小是否超过了最大值，写一个方法
 
+#### 5、根据文件大小分割文件
+
+```go
+// 切割文件
+func (f *FileLogger) splitFile(file *os.File) (*os.File, error) {
+   //2.备份一下 rename
+   nowStr := time.Now().Format("20060102150405000")
+   fileInfo, err := file.Stat()
+   if err != nil {
+      fmt.Printf("get file info failed,err:%v\n", err)
+      return nil, err
+   }
+   logName := path.Join(f.filePath, fileInfo.Name())
+   newLogName := fmt.Sprintf("%s.bak%s", logName, nowStr)
+   //1.关闭当前的日志文件
+   file.Close()
+   os.Rename(logName, newLogName)
+   //3.打开一个新的日志文件
+   fileObj, err := os.OpenFile(logName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+   if err != nil {
+      fmt.Printf("open new log file failed, err:%v\n", err)
+      return nil, err
+   }
+   //4.将打开的新日志文件对象赋值给 f.fileObj
+   return fileObj, nil
+}
+```
+
 ## 87 反射
 
 **了解原理即可**
@@ -695,7 +729,7 @@ time.Second
 
 string（）：拿着字符串做utf8编码找对应的符号 
 
-```
+```go
 func ParseInt(s string, base int, bitSize int) (i int64, err error)
 ```
 

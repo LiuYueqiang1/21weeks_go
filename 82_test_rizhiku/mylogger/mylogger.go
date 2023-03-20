@@ -12,6 +12,15 @@ import (
 // 给log分级别
 type LogLevel uint16 //这里必须是type，而不是var
 
+// 定义一个接口
+type Logger interface {
+	Debug(format string, a ...interface{})
+	Info(format string, a ...interface{})
+	Warining(format string, a ...interface{})
+	Fatal(format string, a ...interface{})
+	Error(format string, a ...interface{})
+}
+
 const (
 	UNKNON LogLevel = iota
 	TRACE
