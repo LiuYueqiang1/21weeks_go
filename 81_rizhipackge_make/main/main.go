@@ -9,7 +9,9 @@ func main() {
 	log := consloe.NewLog("debug")
 	//	fmt.Println(log)  1
 	for {
-		log.Debug("这是一条Debug日志")
+		id := 10010
+		name := "米栗木"
+		log.Debug("这是一条Debug日志,id:%d,name:%s", id, name)
 		log.Trace("这是一条Trace日志")
 		log.Info("这是一条Info日志")
 		log.Warning("这是一条Warning日志")
