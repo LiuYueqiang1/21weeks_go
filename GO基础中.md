@@ -1633,10 +1633,65 @@ main：//2 for
 
 //3 给一个goroutine 
 
-![image-20230315104302712](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230315104302712.png)
+server：
 
-![image-20230315105224959](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230315105224959.png)
+```go
+func processConn(conn net.Conn) {
+   //3.与客户端通信
+   // var tmp [128]byte
+   var tymp = make([]byte, 128)
+   for {
+      n, err := conn.Read(tymp)
+      if err != nil {
+         fmt.Println("read from conn failed,err:", err)
+         return
+      }
+      fmt.Println(string(tymp[:n]))
+   }
 
-![image-20230315104316013](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230315104316013.png)
+}
 
-![image-20230315105405913](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230315105405913.png)
+// 服务端
+func main() {
+   //1.本地端口启动服务
+   listener, err := net.Listen("tcp", "127.0.0.1:2000")
+   if err != nil {
+      fmt.Println("strat tcp server on 127.0.0.1:2000 failed,err:", err)
+      return
+   }
+   //2.等待客户端与我建立连接
+   for {
+      conn, err := listener.Accept()
+      if err != nil {
+         fmt.Println("accept failed,err:", err)
+         return
+      }
+      go processConn(conn)
+   }
+}
+```
+
+client:
+
+```go
+func main() {
+   //1. 与server端建立连接
+   conn, err := net.Dial("tcp", "127.0.0.1:2000")
+   if err != nil {
+      fmt.Println("dial \"tcp\",\"127.0.0.1:2000\" failed,err:", err)
+      return
+   }
+   //2.发送数据
+   reader := bufio.NewReader(os.Stdin)
+   for {
+      fmt.Print("请说话：")
+      msg, _ := reader.ReadString('\n')
+      msg = strings.TrimSpace(msg)
+      if msg == "exit" {
+         break
+      }
+      conn.Write([]byte(msg))
+   }
+   conn.Close()
+}
+```
