@@ -41,10 +41,9 @@ func main() {
 			return
 		}
 		//3、输出用户端信息
-
+		//var tmp [128]byte
 		//for { //循环读取，但是无法实现多个通信，没有办法一次读取多个客户端的信息，所以每新开一个用户就开一个goroutine，
 		//	// 但是建立连接不需要开启多个goroutine，因为都是从一个端口监听的
-		//	var tmp [128]byte
 		//	n, err := conn.Read(tmp[:])
 		//	if err != nil {
 		//		fmt.Println("read from conn failed,err:", err)

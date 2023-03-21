@@ -1676,7 +1676,7 @@ client:
 ```go
 func main() {
    //1. 与server端建立连接
-   conn, err := net.Dial("tcp", "127.0.0.1:2000")
+   conn, err := net.Dial("tcp", "127.0.0.1:2000")//Dial 连接到指定网络上的地址
    if err != nil {
       fmt.Println("dial \"tcp\",\"127.0.0.1:2000\" failed,err:", err)
       return
@@ -1695,3 +1695,128 @@ func main() {
    conn.Close()
 }
 ```
+
+## 内容回顾
+
+### 锁
+
+`sync.Mutex`
+
+是一个结构体，是值类型，给函数传参数的时候要传指针
+
+### 两个方法
+
+```go
+var lock sync.Mutex
+lock.Lock()
+lock.UnLock()
+```
+
+### 为什么要用锁？
+
+防止同一时刻多个goroutine操作同一个资源
+
+
+
+### 互斥锁
+
+### 读写互斥锁
+
+#### 应用场景
+
+适用于读多写少的场景
+
+#### 特点
+
+读的goroutine来了，获取的是读锁，后续的goroutine能读不能写
+
+写的goroutine来了，获取的是写锁，后续的goroutine不管是读还是写都要等待获取锁
+
+#### 使用
+
+```go
+var reLock sync.RWMutex
+rwLock.RLock()//读
+rwLock.RUnlock()
+
+rwLock.Lock()//写
+rwLock.Unlock()//
+```
+
+
+
+### 等待组
+
+`sync.Waitgroup`
+
+用来灯goroutine执行完再继续
+
+是一个结构体,是值类型，**给函数传参的时候需要传指针**
+
+#### 使用
+
+```go
+var sync.WaitGroup
+
+wg.Add(1)
+wg.Done()
+wg.Wait()
+```
+
+### Sync.once
+
+使用场景
+
+某些场景只需要执行一次的时候就可以使用`sync.Once` 
+
+```go
+var once sync.Once
+once.Do()
+```
+
+比如blog加载图片的例子
+
+```go
+//ch2是外部
+f:=func(){
+    close(ch2)
+}//闭包，一个函数包含外部函数的引用，则是一个闭包
+once.Do(f)
+```
+
+比如并发
+
+```go
+
+x,ok:=<- ch1//通道关闭时返回false
+```
+
+### sync.Map
+
+#### 使用场景
+
+并发操作一个map的时候，内置的map不是并发安全的
+
+#### 使用
+
+是一个开箱即用的并发安全的map
+
+```go
+var syncMap sync.Map
+//Map[key] = value
+syncMap.Store(key,value)
+syncMap.Load(key)
+syncMap.LoadOrStore()
+syncMap.Delete()
+syncMap.Range()
+```
+
+### 原子操作
+
+Go语言内置了一些针对内置的基本数据类型的一些并发安全的操作
+
+```go
+var i int64=10
+atomic.AddInt64(&i,1)
+```
+
