@@ -1696,6 +1696,75 @@ func main() {
 }
 ```
 
+##### UDP协议
+
+UDP协议（User Datagram Protocol）中文名称是用户数据报协议，是OSI（Open System Interconnection，开放式系统互联）参考模型中一种**无连接**的传输层协议，不需要建立连接就能直接进行数据发送和接收，属于不可靠的、没有时序的通信，但是UDP协议的实时性比较好，通常用于视频直播相关领域。
+
+服务端
+
+不需要 //2.等待客户端与我建立连接
+
+```go
+// UDP/server/main.go
+
+// UDP server端
+func main() {
+	listen, err := net.ListenUDP("udp", &net.UDPAddr{
+		IP:   net.IPv4(0, 0, 0, 0),
+		Port: 30000,
+	})
+	if err != nil {
+		fmt.Println("listen failed, err:", err)
+		return
+	}
+	defer listen.Close()
+	for {
+		var data [1024]byte
+		n, addr, err := listen.ReadFromUDP(data[:]) // 接收数据
+		if err != nil {
+			fmt.Println("read udp failed, err:", err)
+			continue
+		}
+		fmt.Printf("data:%v addr:%v count:%v\n", string(data[:n]), addr, n)
+		_, err = listen.WriteToUDP(data[:n], addr) // 发送数据
+		if err != nil {
+			fmt.Println("write to udp failed, err:", err)
+			continue
+		}
+	}
+}
+```
+
+客户端
+
+```go
+// UDP 客户端
+func main() {
+	socket, err := net.DialUDP("udp", nil, &net.UDPAddr{
+		IP:   net.IPv4(0, 0, 0, 0),
+		Port: 30000,
+	})
+	if err != nil {
+		fmt.Println("连接服务端失败，err:", err)
+		return
+	}
+	defer socket.Close()
+	sendData := []byte("Hello server")
+	_, err = socket.Write(sendData) // 发送数据
+	if err != nil {
+		fmt.Println("发送数据失败，err:", err)
+		return
+	}
+	data := make([]byte, 4096)
+	n, remoteAddr, err := socket.ReadFromUDP(data) // 接收数据
+	if err != nil {
+		fmt.Println("接收数据失败，err:", err)
+		return
+	}
+	fmt.Printf("recv:%v addr:%v count:%v\n", string(data[:n]), remoteAddr, n)
+}
+```
+
 ## 内容回顾
 
 ### 锁
@@ -1820,3 +1889,36 @@ var i int64=10
 atomic.AddInt64(&i,1)
 ```
 
+### 网络编程
+
+#### 互联网协议
+
+OSI七层模型
+
+## http_server客户端
+
+http_server
+
+![image-20230322111700022](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230322111700022.png)
+
+### 前端规则
+
+HTTP：超文本传输协议
+
+规定了浏览器和网站服务器之间的通信规则
+
+HTML:超文本标记语言
+
+**裸体的人**
+
+学的就是标记的符号，标签
+
+CSS：层叠样式表
+
+**让人穿上衣服**/**化妆**
+
+规定了HTML中标签的具体央视（颜色、背景、大小、位置、浮动）
+
+JavaScript：一种跑在浏览器上的编程语言
+
+**让人动起来**
