@@ -1922,3 +1922,31 @@ CSS：层叠样式表
 JavaScript：一种跑在浏览器上的编程语言
 
 **让人动起来**
+
+## 单元测试122
+
+### 切割字符串测试
+
+![image-20230322162021300](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230322162021300.png)
+
+![image-20230322162603669](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230322162603669.png)
+
+![image-20230322162721911](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230322162721911.png)
+
+### 测试组和子测试124
+
+子测试：![image-20230322165706999](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230322165706999.png)
+
+### 测试函数覆盖率
+
+### 性能基准测试124
+
+## flag包  
+
+**获取命令行参数**
+
+flag.type()
+
+flag.string
+
+flag.int
