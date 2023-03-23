@@ -25,4 +25,5 @@ func main() {
 
 	delete(s1, "rob") //删除rob
 	fmt.Println(s1)
+	//fmt.Println(s1["ss"])
 }

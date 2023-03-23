@@ -1950,3 +1950,21 @@ flag.type()
 flag.string
 
 flag.int
+
+## 面试题
+
+### 如何判断一个链表有没有闭环
+
+![image-20230323092158679](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230323092158679.png)
+
+## 内容回顾
+
+net/http包的用法，如何发请求
+
+![image-20230323093722101](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230323093722101.png)
+
+![image-20230323093910156](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230323093910156.png)
+
+![image-20230323094417814](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230323094417814.png)
+
+![image-20230323094710373](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230323094710373.png)

@@ -6,6 +6,7 @@ func f1() {
 	s1 := []int{1, 2, 3}
 	s2 := s1
 	var s3 []int
+	//s4 := make([]int, 5)
 	copy(s3, s1)
 	fmt.Println(s2) //[1 2 3]
 	s2[1] = 100
@@ -19,6 +20,7 @@ func f2() {
 	s1 := []int{1, 2, 3}
 	s2 := s1
 	var s3 = make([]int, 0, 3)
+
 	copy(s3, s1)
 	fmt.Println(s2) //[1 2 3]
 	s2[1] = 100
@@ -31,6 +33,8 @@ func f3() {
 	s1 := []int{1, 2, 3}
 	s2 := s1
 	var s3 = make([]int, 3, 3)
+	fmt.Println(s3)
+	fmt.Println(s3 == nil) //false
 	copy(s3, s1)
 	fmt.Println(s2) //[1 2 3]
 	s2[1] = 100

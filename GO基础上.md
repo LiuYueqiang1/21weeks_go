@@ -125,6 +125,30 @@ func main() {
 }
 ```
 
+## make()长度和容量
+
+```go
+func main() {
+   var a = make([]string, 5, 10)
+   fmt.Println(a)//[    ]
+   fmt.Println(len(a))//5
+   fmt.Println(cap(a))//10
+   for i := 0; i < 10; i++ {
+      a = append(a, fmt.Sprintf("%v", i))
+   }
+   a[0] = "s"
+   a[1] = "a"
+   fmt.Println(a)//[s a    0 1 2 3 4 5 6 7 8 9]
+   fmt.Println(len(a))//15
+   fmt.Println(cap(a))//20 扩容到两倍
+    
+    var b = make([]int, 5, 10)
+	fmt.Println(b)//[0 0 0 0 0]
+}
+```
+
+
+
 ## map
 
 ```go
