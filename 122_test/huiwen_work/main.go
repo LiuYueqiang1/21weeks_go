@@ -1,33 +1,25 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // 回文检测
-func isPalindrome(a string) bool {
-
-	//b := make(map[int]any, 10)
-	//for in, va := range a {
-	//	b[in] = va
-	//}
-	//fmt.Println(b)
-
-	for i := 0; i < len(a); {
-	tag:
-		i++
-		if a[i] == a[len(a)-i-1] {
-			if i != len(a) {
-				goto tag
-
-			} else {
-				return true
-			}
-		} else {
-			return false
+func Palindrome(input string) error {
+	var arr = []rune(input)
+	j := len(arr) - 1
+	for i := 0; i < j; i++ {
+		if arr[i] != arr[j] {
+			var err = fmt.Sprintf("input[%v]:%v not eq to input[%v]:%v", i, j, string(arr[i]), string(arr[j]))
+			return errors.New(err)
 		}
+		//fmt.Println(string(arr[i]))
+		j--
 	}
-	return false
+	return nil
 }
 func main() {
-	b := isPalindrome("油灯少灯油")
+	b := Palindrome("油灯少灯油")
 	fmt.Println(b)
 }

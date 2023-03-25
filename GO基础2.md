@@ -1925,31 +1925,293 @@ JavaScript：一种跑在浏览器上的编程语言
 
 ## 单元测试122
 
+https://www.liwenzhou.com/posts/Go/unit-test/#autoid-3-2-0
+
 ### 切割字符串测试
 
-![image-20230322162021300](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230322162021300.png)
+```go
+// split/split.go
 
-![image-20230322162603669](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230322162603669.png)
+package split
 
-![image-20230322162721911](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230322162721911.png)
+import "strings"
+
+// split package with a single split function.
+
+// Split slices s into all substrings separated by sep and
+// returns a slice of the substrings between those separators.
+func Split(s, sep string) (result []string) {
+	i := strings.Index(s, sep)
+
+	for i > -1 {
+		result = append(result, s[:i])
+		s = s[i+len(sep):]
+		i = strings.Index(s, sep)
+	}
+	result = append(result, s)
+	return
+}
+```
+
+在当前目录下，我们创建一个`split_test.go`的测试文件，并定义一个测试函数如下：
+
+```go
+// split/split_test.go
+
+package split
+
+import (
+	"reflect"
+	"testing"
+)
+
+func TestSplit(t *testing.T) { // 测试函数名必须以Test开头，必须接收一个*testing.T类型参数
+	got := Split("a:b:c", ":")         // 程序输出的结果
+	want := []string{"a", "b", "c"}    // 期望的结果
+	if !reflect.DeepEqual(want, got) { // 因为slice不能比较直接，借助反射包中的方法比较
+		t.Errorf("expected:%v, got:%v", want, got) // 测试失败输出错误提示
+	}
+}
+func TestMoreSplit(t *testing.T) {
+	got := Split("abcd", "bc")
+	want := []string{"a", "d"}
+	if !reflect.DeepEqual(want, got) {
+		t.Errorf("expected:%v, got:%v", want, got)
+	}
+}
+```
+
+```bash
+split $ go test -v     // -v 查看函数运行时间
+=== RUN   TestSplit
+--- PASS: TestSplit (0.00s)
+=== RUN   TestMoreSplit
+--- FAIL: TestMoreSplit (0.00s)
+    split_test.go:21: expected:[a d], got:[a cd]
+FAIL
+exit status 1
+FAIL    github.com/Q1mi/studygo/code_demo/test_demo/split       0.005s
+```
 
 ### 测试组和子测试124
 
-子测试：![image-20230322165706999](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230322165706999.png)
+#### 测试组
+
+```go
+func TestSplit(t *testing.T) {
+   // 定义一个测试用例类型
+	type test struct {
+		input string
+		sep   string
+		want  []string
+	}
+	// 定义一个存储测试用例的切片
+	tests := []test{
+		{input: "a:b:c", sep: ":", want: []string{"a", "b", "c"}},
+		{input: "a:b:c", sep: ",", want: []string{"a:b:c"}},
+		{input: "abcd", sep: "bc", want: []string{"a", "d"}},
+		{input: "沙河有沙又有河", sep: "沙", want: []string{"河有", "又有河"}},
+	}
+	// 遍历切片，逐一执行测试用例
+	for _, tc := range tests {
+		got := Split(tc.input, tc.sep)
+		if !reflect.DeepEqual(got, tc.want) {
+			t.Errorf("expected:%#v, got:%#v", tc.want, got)
+		}
+	}
+}
+```
+
+
+
+```bash
+split $ go test -v
+=== RUN   TestSplit
+--- FAIL: TestSplit (0.00s)
+    split_test.go:42: expected:[]string{"河有", "又有河"}, got:[]string{"", "河有", "又有河"}
+FAIL
+exit status 1
+FAIL    github.com/Q1mi/studygo/code_demo/test_demo/split       0.006s
+```
+
+#### 子测试
+
+使用map给子测试确定名字
+
+```go
+func TestSplit(t *testing.T) {
+	type test struct { // 定义test结构体
+		input string
+		sep   string
+		want  []string
+	}
+	tests := map[string]test{ // 测试用例使用map存储
+		"simple":      {input: "a:b:c", sep: ":", want: []string{"a", "b", "c"}},
+		"wrong sep":   {input: "a:b:c", sep: ",", want: []string{"a:b:c"}},
+		"more sep":    {input: "abcd", sep: "bc", want: []string{"a", "d"}},
+		"leading sep": {input: "沙河有沙又有河", sep: "沙", want: []string{"河有", "又有河"}},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) { // 使用t.Run()执行子测试
+			got := Split(tc.input, tc.sep)
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Errorf("expected:%#v, got:%#v", tc.want, got)
+			}
+		})
+	}
+}
+```
+
+
+
+```bash
+split $ go test -v
+=== RUN   TestSplit
+=== RUN   TestSplit/leading_sep
+=== RUN   TestSplit/simple
+=== RUN   TestSplit/wrong_sep
+=== RUN   TestSplit/more_sep
+--- FAIL: TestSplit (0.00s)
+    --- FAIL: TestSplit/leading_sep (0.00s)
+        split_test.go:83: expected:[]string{"河有", "又有河"}, got:[]string{"", "河有", "又有河"}
+    --- PASS: TestSplit/simple (0.00s)
+    --- PASS: TestSplit/wrong_sep (0.00s)
+    --- PASS: TestSplit/more_sep (0.00s)
+FAIL
+exit status 1
+FAIL    github.com/Q1mi/studygo/code_demo/test_demo/split       0.006s
+```
 
 ### 测试函数覆盖率
 
+`go test -cover`来查看测试覆盖率
+
 ### 性能基准测试124
+
+#### 基本格式
+
+基准测试就是在一定的工作负载之下检测程序性能的一种方法。基准测试的基本格式如下：
+
+```go
+func BenchmarkName(b *testing.B){
+    // ...
+}
+```
+
+#### -bench
+
+基准测试并不会默认执行，需要增加`-bench`参数，所以我们通过执行`go test -bench=Split`命令执行基准测试
+
+```bash
+split $ go test -bench=Split
+goos: darwin
+goarch: amd64
+pkg: github.com/Q1mi/studygo/code_demo/test_demo/split
+BenchmarkSplit-8        10000000               203 ns/op
+PASS
+ok      github.com/Q1mi/studygo/code_demo/test_demo/split       2.255s
+```
+
+其中`BenchmarkSplit-8`表示对Split函数进行基准测试，数字`8`表示`GOMAXPROCS`的值，这个对于并发基准测试很重要。`10000000`和`203ns/op`表示每次调用`Split`函数耗时`203ns`，这个结果是`10000000`次调用的平均值。
+
+#### -benchmem
+
+添加`-benchmem`参数，来获得内存分配的统计数据。
+
+```bash
+split $ go test -bench=Split -benchmem
+goos: darwin
+goarch: amd64
+pkg: github.com/Q1mi/studygo/code_demo/test_demo/split
+BenchmarkSplit-8        10000000               215 ns/op             112 B/op          3 allocs/op
+PASS
+ok      github.com/Q1mi/studygo/code_demo/test_demo/split       2.394s
+```
+
+`112 B/op`表示每次操作内存分配了112字节，`3 allocs/op`则表示每次操作进行了3次内存分配
+
+#### make函数的优点
+
+使用make函数提前分配内存的改动，减少了2/3的内存分配次数，并且减少了一半的内存分配。
 
 ## flag包  
 
-**获取命令行参数**
+### os.Args
 
-flag.type()
+获取命令行参数
 
-flag.string
+```go
+//os.Args demo
+func main() {
+	//os.Args是一个[]string
+	if len(os.Args) > 0 {
+		for index, arg := range os.Args {
+			fmt.Printf("args[%d]=%v\n", index, arg)
+		}
+	}
+}
+```
 
-flag.int
+命令行：go run 01.go -name=沙河纳扎 -age=28 -married=false -d=1h30m
+
+```bash
+args:[0]=C:\Users\ADMINI~1\AppData\Local\Temp\go-build3528860300\b001\exe\01.exe
+args:[1]=-name=沙河纳扎
+args:[2]=-age=28
+args:[3]=-married=false
+```
+
+命令行：go run 01.go a b c
+
+```bash
+args:[0]=C:\Users\ADMINI~1\AppData\Local\Temp\go-build4193145673\b001\exe\01.exe
+args:[1]=a
+args:[2]=b
+args:[3]=c
+```
+
+### flag.type()
+
+`flag.Type(flag名, 默认值, 帮助信息)*Type` 例如我们要定义姓名、年龄、婚否三个命令行参数，我们可以按如下方式定义：
+
+```go
+name := flag.String("name", "张三", "姓名")
+age := flag.Int("age", 18, "年龄")
+married := flag.Bool("married", false, "婚否")
+delay := flag.Duration("d", 0, "时间间隔")
+```
+
+需要注意的是，此时`name`、`age`、`married`、`delay`均为对应类型的**指针**
+
+### flag.TypeVar()
+
+```go
+flag.TypeVar(Type指针, flag名, 默认值, 帮助信息)
+```
+
+```go
+func main() {
+	//定义命令行参数方式1
+	var name string
+	var age int
+	var married bool
+	var delay time.Duration
+	flag.StringVar(&name, "name", "张三", "姓名")
+	flag.IntVar(&age, "age", 18, "年龄")
+	flag.BoolVar(&married, "married", false, "婚否")
+	flag.DurationVar(&delay, "d", 0, "延迟的时间间隔")
+
+	//解析命令行参数
+	flag.Parse()
+	fmt.Println(name, age, married, delay)
+	//返回命令行参数后的其他参数
+	fmt.Println(flag.Args())
+	//返回命令行参数后的其他参数个数
+	fmt.Println(flag.NArg())
+	//返回使用的命令行参数个数
+	fmt.Println(flag.NFlag())
+}
+```
 
 ## 面试题
 
