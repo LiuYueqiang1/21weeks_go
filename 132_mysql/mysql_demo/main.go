@@ -160,7 +160,7 @@ func main() {
 	fmt.Println("连接数据库成功")
 	//queryOne(2)
 	//insert()
-	prepareInsert()
+	//	prepareInsert()
 	queryMore(0)
 	//updateRowDemo()
 	//deleteRowDemo()

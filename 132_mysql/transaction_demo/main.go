@@ -41,8 +41,8 @@ func transactionDemo() {
 		fmt.Println("开启事务失败,err::", err)
 		return
 	}
-	sqlStr1 := `update user set age=age+10 where id =1;`
-	sqlStr2 := `update user set age=age-10 where id =2;`
+	sqlStr1 := `update user set age=age-2 where id =1;`
+	sqlStr2 := `update user set age=age+2 where id =2;`
 	ret1, err := tx.Exec(sqlStr1)
 	if err != nil {
 		//回滚
