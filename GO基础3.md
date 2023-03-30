@@ -545,3 +545,61 @@ func main() {
 
 ### sqlx注入
 
+# Redis
+
+Redis是一个开源的内存数据库，Redis提供了多种不同类型的数据结构，很多业务场景下的问题都可以很自然地映射到这些数据结构上。除此之外，通过复制、持久化和客户端分片等特性，我们可以很方便地将Redis扩展成一个能够包含数百GB数据、每秒处理上百万次请求的系统。
+
+- 缓存系统，减轻主数据库（MySQL）的压力。
+- 计数场景，比如微博、抖音中的关注数和粉丝数。
+- 热门排行榜，需要排序的场景特别适合使用ZSET。
+- 利用 LIST 可以实现队列的功能。
+- 利用 HyperLogLog 统计UV、PV等数据。
+- 使用 geospatial index 进行地理位置相关查询。
+
+# 今日内容day11
+
+# 依赖管理go module146
+
+简单来说，设置`GO111MODULE=on`之后就可以使用`go module`了，以后就没有必要在GOPATH中创建项目了，并且还能够很好的管理项目依赖的第三方包信息。
+
+![image-20230330105825156](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230330105825156.png)
+
+go.sum文件
+
+详细的包名和信息
+
+常用的命令
+
+```bash
+go mod init //初始化项目
+```
+
+
+
+# Context
+
+在主goroutine里的子goroutine如何优雅的退出
+
+![image-20230330092006702](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230330092006702.png)
+
+ 2、
+
+![image-20230330093333472](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230330093333472.png)
+
+![image-20230330093517546](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230330093517546.png)
+
+为了简化上述情况，则开发了context
+
+![image-20230330094521674](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230330094521674.png)
+
+28：00 可以在goroutine里再开一个goroutine
+
+![image-20230330103654010](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230330103654010.png)
+
+![image-20230330103637947](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230330103637947.png)
+
+# 日志收集项目
+
+环境搭建指南
+
+https://docs.qq.com/doc/DTmdldEJJVGtTRkFi
