@@ -23,11 +23,11 @@ func read() {
 func write() {
 	defer wg1.Done()
 	//	lo.Lock()
-	rw.RLock()
+	rw.Lock()
 	y = y + 1
 	time.Sleep(time.Millisecond * 5)
 	//lo.Unlock()
-	rw.RUnlock()
+	rw.Unlock()
 }
 func main() {
 	now := time.Now()

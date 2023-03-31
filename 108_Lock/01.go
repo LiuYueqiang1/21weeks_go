@@ -8,6 +8,8 @@ import (
 var x = 0
 var wg sync.WaitGroup
 var lock sync.Mutex //互斥锁
+// 如果不加锁的话
+// 某个 goroutine 中对全局变量x的修改可能会覆盖掉另一个 goroutine 中的操作
 func add() {
 	defer wg.Done()
 	for i := 0; i < 10000; i++ {

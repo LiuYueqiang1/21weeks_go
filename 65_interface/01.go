@@ -14,7 +14,7 @@ func (d dog) speak() {
 	fmt.Printf("%v会汪汪汪~\n", d.name)
 }
 func (c cat) speak() {
-	fmt.Println(("喵喵喵~"))
+	fmt.Printf("%s喵喵喵~\n", c.name)
 }
 
 type speaker interface { //接口是一种类型
@@ -25,10 +25,16 @@ func da(x speaker) { //定义了一个名为da的函数，传入了一个变量�
 	x.speak() //这个接口类型的变量做了什么方法
 }
 
+// 结构体的构造函数
+func newCat(name string) *cat {
+	return &cat{
+		name: name,
+	}
+}
 func main() {
 	var d1 dog
 	d1.name = "大黄"
-	var c1 cat
+	c1 := newCat("米粒")
 	//定义一个函数，传入一个接口，调用函数实现这个方法
 	da(d1) //大黄会汪汪汪~
 	da(c1) //喵喵喵~
@@ -41,4 +47,6 @@ func main() {
 	//直接用结构体实现方法
 	d1.speak()
 	c1.speak()
+	fmt.Println("--------")
+	da(s1)
 }

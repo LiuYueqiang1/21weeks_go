@@ -12,6 +12,8 @@ func reflectTV(x interface{}) {
 	v2 := reflect.ValueOf(x)
 	fmt.Println(v1)
 	fmt.Println(v2)
+
+	fmt.Println(v1.Kind(), v1.Name(), v2.Kind())
 }
 func main() {
 	var a float64 = 3.14
