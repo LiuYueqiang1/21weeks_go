@@ -28,20 +28,21 @@ func (m *MutexCounter) Load() int64 {
 	return m.counter
 }
 func test(c Counter) {
-	var wg sync.WaitGroup
-	start := time.Now()
+	strat := time.Now()
+	wg := sync.WaitGroup{}
 	for i := 0; i < 1000; i++ {
 		wg.Add(1)
 		go func() {
 			c.Inc()
 			wg.Done()
 		}()
+
 	}
 	wg.Wait()
 	end := time.Now()
-	fmt.Println(c.Load(), end.Sub(start))
-}
 
+	fmt.Println(c.Load(), end.Sub(strat))
+}
 func main() {
 
 	c2 := MutexCounter{} // 使用互斥锁实现并发安全
