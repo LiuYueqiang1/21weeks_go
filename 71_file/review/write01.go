@@ -9,7 +9,7 @@ import (
 
 func main() {
 	//创建一个文件1
-	fileObj, err := os.OpenFile("F:\\goland\\go_project\\21weeks\\21weeks_go\\71_file\\review\\write1.txt", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
+	fileObj, err := os.OpenFile("./writetest.txt", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 	if err != nil {
 		fmt.Println("err:", err)
 		return
@@ -19,7 +19,7 @@ func main() {
 	fileObj.Write([]byte(str))
 	fileObj.WriteString("你好1 good!\n")
 	//读文件2
-	filename, err := os.Open("F:\\goland\\go_project\\21weeks\\21weeks_go\\71_file\\review\\write1.txt")
+	filename, err := os.Open("./writetest.txt")
 	if err != nil {
 		fmt.Println("err:", err)
 		return
