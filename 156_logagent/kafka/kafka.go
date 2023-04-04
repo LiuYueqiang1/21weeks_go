@@ -1,29 +1,36 @@
-package main
+package kafka
 
 import (
 	"fmt"
 	"github.com/Shopify/sarama"
 )
 
-// 基于sarama第三方库开发的kafka client
-func main() {
+//打开往kafka写日志的模块
+
+var (
+	client sarama.SyncProducer //声明一个全局的连接kafka的生产者client
+)
+
+// Init 初始化client
+func Init(addrs []string) (err error) {
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll          //发送完整数据类型leader和follow都确认
 	config.Producer.Partitioner = sarama.NewRandomPartitioner //新选出一个partition
 	config.Producer.Return.Successes = true                   //成功交付的消息将在success channel返回
-	//构造一个消息
-	msg := &sarama.ProducerMessage{}
-	msg.Topic = "web_log"
-	msg.Value = sarama.StringEncoder("this is a test log")
 	//连接kafka
-	client, err := sarama.NewSyncProducer([]string{"127.0.0.1:9092"}, config)
+	client, err = sarama.NewSyncProducer(addrs, config)
 	if err != nil {
-		fmt.Println("prodicer closed,err:", err)
+		fmt.Println("producer closed,err:", err)
 		return
 	}
-	fmt.Println("连接kafka成功")
-	defer client.Close()
-	//发送消息
+	return
+}
+func SendToKafka(topic, data string) {
+	//构造一个消息
+	msg := &sarama.ProducerMessage{}
+	msg.Topic = topic
+	msg.Value = sarama.StringEncoder(data)
+	//发送到kafka
 	pid, offset, err := client.SendMessage(msg)
 	fmt.Println("xxx")
 	if err != nil {
