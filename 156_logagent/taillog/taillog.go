@@ -25,6 +25,8 @@ func Init(fileName string) (err error) {
 	}
 	return
 }
+
+// 只读的单项通道
 func ReadChan() <-chan *tail.Line {
 	return tailObj.Lines
 }

@@ -534,5 +534,262 @@ import (
 
 ## 157、配置文件版LogAgent
 
-创建配置文件ini
+创建配置文件ini：
+
+创建文件夹conf：创建文件config.ini
+
+ini中文网使用教程：[开始使用 - go-ini/ini (unknwon.cn)](https://ini.unknwon.cn/docs/intro/getting_started)
+
+```go
+[kafka]
+address=127.0.0.1:9092
+topic=web_log
+
+[taillog]
+filename=F:\goland\go_project\21weeks\my.log
+```
+
+### 写法1
+
+main.go 
+
+```go
+//0.加载配置文件
+cfg, err = ini.Load("./conf/config.ini")
+if err != nil {
+   fmt.Printf("Fail to read file: %v", err)
+   os.Exit(1)
+}
+//init 不能写注释
+//fmt.Println(cfg.Section("kafka").Key("address").String())
+//fmt.Println(cfg.Section("kafka").Key("topic").String())
+//fmt.Println(cfg.Section("taillog").Key("filename).String())
+其它的改一下
+```
+
+main.go 完整
+
+```go
+package main
+
+import (
+   "example.com/logagent/kafka"
+   "example.com/logagent/taillog"
+   "fmt"
+   "gopkg.in/ini.v1"
+   "os"
+   "time"
+)
+
+var (
+   err error
+   cfg *ini.File
+)
+
+func run() {
+   //1、读取日志
+   for {
+      select {
+      case line := <-taillog.ReadChan():
+         //2、发送到kafka
+         kafka.SendToKafka(cfg.Section("kafka").Key("topic").String(), line.Text)
+      default:
+         time.Sleep(time.Second)
+      }
+   }
+}
+
+// logAgent入口程序
+func main() {
+   //0.加载配置文件
+   cfg, err = ini.Load("./conf/config.ini")
+   if err != nil {
+      fmt.Printf("Fail to read file: %v", err)
+      os.Exit(1)
+   }
+   //init 不能写注释
+   fmt.Println(cfg.Section("kafka").Key("address").String())
+   fmt.Println(cfg.Section("kafka").Key("topic").String())
+   fmt.Println(cfg.Section("taillog").Key("filename").String())
+   //1、初始化kafka连接
+   err = kafka.Init([]string{cfg.Section("kafka").Key("address").String()})
+   if err != nil {
+      fmt.Printf("init Kafka failed,err:%v\n", err)
+      return
+   }
+   fmt.Println("init kafka success")
+   //2、打开日志文件准备收集日志
+   err = taillog.Init(cfg.Section("taillog").Key("filename").String())
+   if err != nil {
+      fmt.Printf("init taillog failed,err:%v\n", err)
+      return
+   }
+   fmt.Println("init taillog success")
+   run()
+}
+```
+
+### 写法2
+
+在conf文件夹里创建一个结构体：
+
+```go
+package conf
+
+type Sumconfig struct {
+   KafkaConf   `ini:"kafka"`
+   TaillogConf `ini:"taillog"`
+}
+type KafkaConf struct {
+   Address string `ini:"address"`
+   Topic   string `ini:"topic"`
+}
+type TaillogConf struct {
+   Filename string `ini:"filename"`
+}
+```
+
+main.go
+
+```go
+package main
+
+import (
+   "example.com/logagent/conf"
+   "example.com/logagent/kafka"
+   "example.com/logagent/taillog"
+   "fmt"
+   "gopkg.in/ini.v1"
+   "time"
+)
+
+var (
+   cfg = new(conf.Sumconfig)
+)
+
+func run() {
+   //1、读取日志
+   for {
+      select {
+      case line := <-taillog.ReadChan():
+         //2、发送到kafka
+         kafka.SendToKafka(cfg.KafkaConf.Topic, line.Text)
+      default:
+         time.Sleep(time.Second)
+      }
+   }
+}
+
+// logAgent入口程序
+func main() {
+   // 将配置文件加载出来映射到cfg对象里面
+   err := ini.MapTo(cfg, "./conf/config.ini")
+   if err != nil {
+      fmt.Printf("Fail to read file: %v", err)
+      return
+   }
+   //1、初始化kafka连接
+   err = kafka.Init([]string{cfg.KafkaConf.Address})
+   if err != nil {
+      fmt.Printf("init Kafka failed,err:%v\n", err)
+      return
+   }
+   fmt.Println("init kafka success")
+   //2、打开日志文件准备收集日志
+   err = taillog.Init(cfg.TaillogConf.Filename)
+   if err != nil {
+      fmt.Printf("init taillog failed,err:%v\n", err)
+      return
+   }
+   fmt.Println("init taillog success")
+   run()
+}
+```
+
+# 内容回顾
+
+## go module
+
+依赖管理工具
+
+## context
+
+goroutine管理
+
+```context.Context```
+
+两个根节点:```context.Backgrpund()```,```context.TODO()```
+
+四个方法:```context.withCancel()```、```context.withTimeout()```、```context.withDeadline()```、```context.withValue()```
+
+## 日志收集项目
+
+### ELK：目前业界主流的日志收集方案
+
+缺点：部署的时候比较麻烦。每一个filebeat都需要配置一个配置文件。
+
+解决：使用etcd来管理被收集的日志项。
+
+### 项目架构：
+
+![image-20230403091601178](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403091601178.png)
+
+1、kafka：消息队列
+
+2、tailf：读日志的第三方库
+
+3、go-ini :解析配置文件
+
+# etcd
+
+使用etcd优化日志收集项目
+
+协议：
+
+1、了解Raft协议
+
+​	1、选举
+
+​	2、日志复制机制
+
+​	3、异常处理（脑裂）
+
+​	4、zookeeper的zad协议的区别
+
+![img](https://www.liwenzhou.com/images/Go/etcd/etcd_01.png)
+
+etcd部署：[etcd部署 (qq.com)](https://docs.qq.com/doc/DTndrQXdXYUxUU09O)
+
+错误1：[(48条消息) `golang` 调用 `etcdv3` 报错 `undefined: balancer.PickOptions`_斜杠打卡小程序的博客-CSDN博客](https://blog.csdn.net/qq_32828933/article/details/107179973)
+
+错误信息：
+
+```go
+# github.com/coreos/etcd/clientv3/balancer/picker
+undefined: balancer.PickOptions
+undefined: balancer.PickOptions
+
+# github.com/coreos/etcd/clientv3/balancer/resolver/endpoint
+undefined: resolver.BuildOption
+undefined: resolver.ResolveNowOption
+```
+
+解决方法：
+
+```go
+将 grpc 版本替换成 v1.26.0
+```
+
+修改依赖为 v1.26.0
+
+```go
+go mod edit -require=google.golang.org/grpc@v1.26.0
+```
+
+获取 v1.26.0 版本的 grpc
+
+```go 
+go get -u -x google.golang.org/grpc@v1.26.0
+```
+
 
