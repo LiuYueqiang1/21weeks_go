@@ -70,25 +70,25 @@ NSQ：将同步消息队列转化为异步的，可以作为进程间的通信�
 
 消息生产者（发布）将消息发布到topic中，同时有多个消息消费者（订阅）消费该消息。和点对点方式不同，发布到topic的消息会被所有订阅者消费（类似于关注了微信公众号的人都能收到推送的文章）。补充：发布订阅模式下，当发布者消息量很大时，显然单个订阅者的处理能力是不足的。实际上现实场景中是多个订阅者节点组成一个订阅组负载均衡消费topic消息即分组订阅，这样订阅者很容易实现消费能力线性扩展。可以看成是一个topic下有多个Queue,每个Queue是点对点的方式，Queue之间是发布订阅方式。
 
-## Kafka
+# Kafka
 
 Apache Kafka由著名职业社交公司Linkedln开发，最初是被设计用来解决LinkedIn公司内部海量日志传输等问题。Kafka使用Scala语言编写，2011年开源并进入Apache孵化器，2012年10月正式毕业，现在为Apache顶级项目
 
 ## 介绍
 
-Kafka是一个分布式数据流平台，可以运行在单台服务器上，也可以在多台服务器上部署形成集群。他提供了发布和订阅功能，使用者可以发送数据到Kafka中，也可以从Kafka中读取数据（以便进行后续的处理）。Kafka具有高吞吐、低延迟、高容错等特点。
+Kafka是一个分布式数据流平台，可以运行在单台服务器上，也可以在多台服务器上部署形成集群。它提供了发布和订阅功能，使用者可以**发送数据到Kafka中**，也可以**从Kafka中读取数据**（以便进行后续的处理）。Kafka具有高吞吐、低延迟、高容错等特点。
 
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403094603816.png" alt="image-20230403094603816" style="zoom:80%;" />
 
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403094623766.png" alt="image-20230403094623766" style="zoom:80%;" />
 
-- Producer：生产者将，消息的产生这，是消息的入口。数据扔到Cluster中，Consumer然后从中获取
+- Producer：生产者，消息的产生者，是消息的入口。数据扔到Cluster中，Consumer然后从中获取
 
-- Kafka Cluster：kafka集群，一台或者多台服务器组成。Broker被称为节点，三台机器（代理）
+- Kafka Cluster：kafka集群，**一台或者多台==服务器==组成**。Broker被称为节点，三台机器（代理）
 
-  - ​		Broker：Broker是指部署了Kafka实例的服务器节点。每个服务器上有一个或多个kafka的实列，我们姑且认为每个broker对应一台服务器。每个Kafka集群内的broker都有一个不重复的编号，如图中broker-0、broker-1等...
+  + Broker：Broker是指部署了Kafka实例的服务器节点。每个服务器上有一个或多个kafka的实列，我们姑且认为每个broker对应一台服务器。每个Kafka集群内的broker都有一个不重复的编号，如图中broker-0、broker-1等...
 
-  - ​		Topic：消息的主题 ，可以理解为消息的分蘖，kafka的数据就保存在同批次。每个broker上都可以创建多个同批次。实际应用中通常是一个业务线建立一个topic
+  - ​		Topic：**消息的主题** ，可以理解为消息的分区，kafka的数据就保存在同批次。每个broker上都可以创建多个同批次。实际应用中通常是一个业务线建立一个topic
 
   - ​		Partition：Topic的分区，每个topic可以有多个分区，分区的作用是做负载，提高kafka的吞吐量。同一个topic在不同的分区数据是不重复的，partition的表现形式就是一个一个的文件夹。
 
@@ -101,11 +101,27 @@ Kafka是一个分布式数据流平台，可以运行在单台服务器上，也
 
 ![image-20230403095351391](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403095351391.png)
 
-![image-20230403101417190](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403101417190.png)
+## 选择partition的原则
 
-![image-20230403101526670](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403101526670.png)
+在kafka中，如果topic有多个partition，producer将数据发送到哪个partition中呢？
 
-![image-20230403102611750](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403102611750.png)
+1. ==**指定**==：partition在写入的时候可以指定需要写入的partition，如果有指定，则写入对应的partition
+2. ==**hash**==：如果没有指定的partition，但是设置了数据的key，则会根据key的值hash出一个partition
+3. ==**轮询**==：如果既没有指定的partition，又没有设置key，则会用轮询方式，即每次取出一小段时间的数据写入某个partition，下一段的时间写入下一个partition
+
+## ACK应答机制
+
+producer在向kafka写入消息的时候，可以设置参数来确定是否确认kafka接收到数据
+
+- 0 代表producer往集群发送数据不需要等到集群的返回，不确保消息发送成功。安全性最低但是效率最高。
+- 1 代表producer往集群发送数据只要leader应答就可以发送下一条，只确保leader发送成功。
+- all 代表producer往集群发送数据需要所有的follower都完成从leader的同步才会发送下一条，确保leader发送成功和所有的副本都完成备份。安全性最高，但是效率最低。
+
+注意：如果往不存在的topic里写数据，kafka会自动创建topic，partition和replication的数量默认配置都是1。
+
+## Topic和数据日志
+
+```topic```是同一类别的消息记录record的集合。在Kafka中，一个主题通常有多个订阅者。对于每个主题，Kafka集群维护了一个分区数据日志文件结构如下：
 
 ![image-20230403102620825](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403102620825.png)
 
@@ -515,3 +531,8 @@ import (
 	"example.com/logagent/taillog"
 )
 ```
+
+## 157、配置文件版LogAgent
+
+创建配置文件ini
+
