@@ -13,19 +13,6 @@ var (
 	cfg = new(conf.Sumconfig)
 )
 
-//func run() {
-//	//1、读取日志
-//	for {
-//		select {
-//		case line := <-taillog.ReadChan():
-//			//2、发送到kafka
-//			kafka.SendToKafka(cfg.KafkaConf.Topic, line.Text)
-//		default:
-//			time.Sleep(time.Second)
-//		}
-//	}
-//}
-
 // logAgent入口程序
 func main() {
 	// 将配置文件加载出来映射到cfg对象里面
@@ -49,13 +36,16 @@ func main() {
 		return
 	}
 	fmt.Println("init etcd success")
-	//2、打开日志文件准备收集日志
-	//err = taillog.Init(cfg.TaillogConf.Filename)
-	//if err != nil {
-	//	fmt.Printf("init taillog failed,err:%v\n", err)
-	//	return
-	//}
-	//fmt.Println("init taillog success")
-	//3、具体的业务
-	//run()
+
+	//2、1从etcd中获取日志收集项的配置信息
+	logEntryConf, err := etcd.GetConf("/xxx")
+	//2、2拍一个哨兵去监视日志收集项的变化（有变化及时通知我的logAgent实现加载配置）
+	if err != nil {
+		fmt.Printf("etcd.GetConf failed,err:%v\n", err)
+		return
+	}
+	fmt.Printf("get conf from etcd success,%v\n", logEntryConf)
+	for index, value := range logEntryConf {
+		fmt.Printf("index:%v  value:%v\n", index, value)
+	}
 }

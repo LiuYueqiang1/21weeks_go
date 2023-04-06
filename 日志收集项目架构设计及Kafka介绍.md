@@ -915,7 +915,7 @@ ac93-f8bd79d9ddfa/127.0.0.1:2379","attempt":0,"error":"rpc error: code = Deadlin
 put to etcd failed, err:context deadline exceeded
 ```
 
-报错，put失败，超出时间限制
+报错，put失败，超出上下文截止时间
 
 url改为：
 
@@ -923,3 +923,28 @@ url改为：
 localhost:2379
 ```
 
+从etcd中获取日志收集项的配置信息
+
+![image-20230406202431844](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406202431844.png)
+
+将key value反序列化到json里面
+
+![image-20230406202548250](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406202548250.png)
+
+
+
+   ![image-20230406202750266](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406202750266.png)
+
+![image-20230406202934173](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406202934173.png)
+
+新建一个etcd_put
+
+![image-20230406203032394](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406203032394.png)
+
+<img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406203954240.png" alt="image-20230406203954240" style="zoom:150%;" />
+
+![image-20230406204015480](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406204015480.png)
+
+![image-20230406204100299](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406204100299.png)
+
+![image-20230406204132009](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406204132009.png)
