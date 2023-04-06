@@ -445,6 +445,37 @@ func ReadChan() <-chan *tail.Line {
 }
 ```
 
+conf 
+
+config.go
+
+```go
+package conf
+
+type Sumconfig struct {
+   KafkaConf   `ini:"kafka"`
+   TaillogConf `ini:"taillog"`
+}
+type KafkaConf struct {
+   Address string `ini:"address"`
+   Topic   string `ini:"topic"`
+}
+type TaillogConf struct {
+   Filename string `ini:"filename"`
+}
+```
+
+config,ini
+
+```go
+[kafka]
+address=127.0.0.1:9092
+topic=web_log
+
+[taillog]
+filename=F:\goland\go_project\21weeks\my.log
+```
+
 ### 运行：
 
 主文件夹在终端中打开，输入以下命令：
@@ -742,6 +773,8 @@ goroutine管理
 
 # etcd
 
+## 基本
+
 使用etcd优化日志收集项目
 
 协议：
@@ -760,7 +793,80 @@ goroutine管理
 
 etcd部署：[etcd部署 (qq.com)](https://docs.qq.com/doc/DTndrQXdXYUxUU09O)
 
-错误1：[(48条消息) `golang` 调用 `etcdv3` 报错 `undefined: balancer.PickOptions`_斜杠打卡小程序的博客-CSDN博客](https://blog.csdn.net/qq_32828933/article/details/107179973)
+## put和get操作
+
+### 初始化
+
+安装：```go get go.etcd.io/etcd/clientv3```
+
+代码：
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"go.etcd.io/etcd/clientv3"
+	"time"
+)
+
+func main() {
+	//导入的包，v3表示版本
+	// 创建etcd客户端
+	cli, err := clientv3.New(clientv3.Config{
+		//节点
+		Endpoints: []string{"localhost:2379"},
+		//5s钟都连不上就超时了
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		// handle error!
+		fmt.Printf("connect to etcd failed, err:%v\n", err)
+		return
+	}
+	fmt.Println("connect to etcd success")
+	defer cli.Close()
+	// put 创建一个键值
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	_, err = cli.Put(ctx, "q1mi", "dsb")
+	cancel()
+	if err != nil {
+		fmt.Printf("put to etcd failed, err:%v\n", err)
+		return
+	}
+	// get 获取一个键的值
+	ctx, cancel = context.WithTimeout(context.Background(), time.Second)
+	resp, err := cli.Get(ctx, "q1mi")
+	cancel()
+	if err != nil {
+		fmt.Printf("get from etcd failed, err:%v\n", err)
+		return
+	}
+	//Kvs多个键值对，一个个遍历出来
+	for _, ev := range resp.Kvs {
+		fmt.Printf("%s:%s\n", ev.Key, ev.Value)
+	}
+}
+```
+
+初始化go.mod ```go mod init etcd_demo.com/etcd1```
+
+整理依赖关系```go mod tidy```
+
+```go build```出现以下问题：
+
+```go
+C:\Users\Administrator\go\pkg\mod\github.com\coreos\etcd@v3.3.27+incompatible\clientv3\balancer\resolver\endpoint\endpoint.go:182:40: undefined: resolver.ResolveNowOption
+# github.com/coreos/etcd/clientv3/balancer/picker
+C:\Users\Administrator\go\pkg\mod\github.com\coreos\etcd@v3.3.27+incompatible\clientv3\balancer\picker\err.go:37:53: undefined: balancer.PickOptions
+```
+
+### 错误1：
+
+[(48条消息) `golang` 调用 `etcdv3` 报错 `undefined: balancer.PickOptions`_斜杠打卡小程序的博客-CSDN博客](https://blog.csdn.net/qq_32828933/article/details/107179973)
+
+[(48条消息) golang etcd 报错 undefined: resolver.BuildOption 解决方案_wohu1104的博客-CSDN博客](https://blog.csdn.net/wohu1104/article/details/107923944)
 
 错误信息：
 
@@ -792,4 +898,28 @@ go mod edit -require=google.golang.org/grpc@v1.26.0
 go get -u -x google.golang.org/grpc@v1.26.0
 ```
 
+命令行：
+
+```cd /d F:\goland\go_project\etcd\etcd-v3.4.24-windows-amd64```
+
+```etcdctl.exe --endpoints=http://127.0.0.1:2379 put qikey "sh1"```
+
+```etcdctl.exe --endpoints=http://127.0.0.1:2379 get qikey```
+
+### 错误2：
+
+```go
+connect to etcd success
+{"level":"warn","ts":"2023-04-06T15:41:59.416+0800","caller":"clientv3/retry_interceptor.go:62","msg":"retrying of unary invoker failed","target":"endpoint://client-23dc86cb-73cb-4fb0-
+ac93-f8bd79d9ddfa/127.0.0.1:2379","attempt":0,"error":"rpc error: code = DeadlineExceeded desc = context deadline exceeded"}
+put to etcd failed, err:context deadline exceeded
+```
+
+报错，put失败，超出时间限制
+
+url改为：
+
+```go
+localhost:2379
+```
 

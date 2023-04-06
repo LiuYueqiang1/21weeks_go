@@ -3,19 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
-	"time"
-
 	"go.etcd.io/etcd/clientv3"
+	"time"
 )
-
-// etcd client put/get demo
-// use etcd/clientv3
 
 func main() {
 	//导入的包，v3表示版本
+	// 创建etcd客户端
 	cli, err := clientv3.New(clientv3.Config{
 		//节点
-		Endpoints: []string{"127.0.0.1:2379"},
+		Endpoints: []string{"localhost:2379"},
 		//5s钟都连不上就超时了
 		DialTimeout: 5 * time.Second,
 	})
@@ -26,7 +23,7 @@ func main() {
 	}
 	fmt.Println("connect to etcd success")
 	defer cli.Close()
-	// put
+	// put 创建一个键值
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	_, err = cli.Put(ctx, "q1mi", "dsb")
 	cancel()
@@ -34,7 +31,7 @@ func main() {
 		fmt.Printf("put to etcd failed, err:%v\n", err)
 		return
 	}
-	// get
+	// get 获取一个键的值
 	ctx, cancel = context.WithTimeout(context.Background(), time.Second)
 	resp, err := cli.Get(ctx, "q1mi")
 	cancel()
