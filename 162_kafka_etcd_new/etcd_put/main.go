@@ -21,13 +21,14 @@ func main() {
 		fmt.Printf("connect to etcd failed, err:%v\n", err)
 		return
 	}
-	fmt.Println("connect to etcd success")
-	defer cli.Close()
+	fmt.Println("connect to etcd success!")
+	//defer cli.Close()
 	// put 创建一个键值
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	value := `[{"path":"c/temp/.log","topic":"web_log"},{"path":"d/xxx/redix.log","topic":"web_log"}]`
-	_, err = cli.Put(ctx, "/xxx", value)
+	_, err = cli.Put(ctx, "/logagent/collect_config", value)
 	cancel()
+	fmt.Println("put to etcd success!")
 	if err != nil {
 		fmt.Printf("put to etcd failed, err:%v\n", err)
 		return

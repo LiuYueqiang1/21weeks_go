@@ -10,9 +10,10 @@ import (
 
 var cli = new(clientv3.Client)
 
+// 需要收集的日志的配置信息
 type LogEntry struct {
-	Path  string `json:"path"`
-	Topic string `json:"topic"`
+	Path  string `json:"path"`  //日志存放的路径
+	Topic string `json:"topic"` //日志要发往kafka中的哪个Topic
 }
 
 // 初始化ETCD的函数
@@ -30,7 +31,7 @@ func Init(addr string, timeout time.Duration) (err error) {
 		return
 	}
 	fmt.Println("connect to etcd success")
-	defer cli.Close()
+	//defer cli.Close()
 	return
 }
 
