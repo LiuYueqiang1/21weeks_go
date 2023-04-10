@@ -8,6 +8,8 @@
 
 ## 解决方案
 
+日志收集-->**存储**-->**建立索引**去获取-->**找到**日志记录-->通过web页面**展示检索**
+
 把机器上的日志实时收集，统一存储到中心系统。再对这些日志建立索引，通过搜索即可快速找到对应的日志记录。通过提供一个界面友好的web页面实现日志展示与检索。
 
 ## 面临的问题
@@ -25,18 +27,20 @@ filebit从AppServer收集信息给LogstashAgent
 ## ELK方案的问题
 
 - 运维成本高，每增加一个日志收集项，都需要手动修改配置。
-- 监控缺失，无法准确获取logstash的状态。
+- **监控缺失**，无法准确获取logstash的状态。
 - 无法做到定制化开发与维护
 
 # 日志收集系统架构设计
 
 ![image-20230403091601178](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403091601178.png)
 
-Log Agent具体部署到每一台业务的服务器上，配置项收集日志，存储到etcd中。
+Log Agent具体部署到每一台业务的服务器上，根据配置项收集日志，配置项是存储到etcd中的。
 
 etcd中写一个web管理页面，管理所有的配置项。
 
 Log Agent将每一个项目的日志收集后存到Kafka中，Kafka既能作为消息队列，也能作为日志存储。
+
+Elastic Search可以检索，Kibana作为web工具
 
 Sys Agent 做系统监控，例如cpu负载，IO，网络速率
 
@@ -48,27 +52,32 @@ Kibaa：开源的ES数据分析和可视化工具。Hadoop：分布式计算框�
 
 Strom：一个免费并且开源的分布式实时计算系统。
 
-## 将学到的技能
+## *将学到的技能
 
-服务端agent开发
+- 服务端agent开发
 
-后端服务组件开发
+- 后端服务组件开发
 
-etcd的使用
+- etcd的使用
 
-Kafka和zookeeper的使用
+- Kafka和zookeeper的使用
 
-ES和Kibana的使用
+- ES和Kibana的使用
+
 
 ## 消息队列的通信模型
 
-NSQ：将同步消息队列转化为异步的，可以作为进程间的通信。
+NSQ：将同步消息队列转化为异步的，可以作为进程间的通信(例如：go语言程序和php之间的程序做通信)。
+
+点对点模式：
 
 消息生产者生产消息发送到queue中，然后消息消费者从queue中取出并且消费消息。一条消息被消费以后，queue中就没有了，不存在重复消费。
 
 ## 发布/订阅（topic）
 
-消息生产者（发布）将消息发布到topic中，同时有多个消息消费者（订阅）消费该消息。和点对点方式不同，发布到topic的消息会被所有订阅者消费（类似于关注了微信公众号的人都能收到推送的文章）。补充：发布订阅模式下，当发布者消息量很大时，显然单个订阅者的处理能力是不足的。实际上现实场景中是多个订阅者节点组成一个订阅组负载均衡消费topic消息即分组订阅，这样订阅者很容易实现消费能力线性扩展。可以看成是一个topic下有多个Queue,每个Queue是点对点的方式，Queue之间是发布订阅方式。
+消息生产者（发布）将消息发布到topic中，同时有多个消息消费者（订阅）消费该消息。和点对点方式不同，发布到topic的消息会被所有订阅者消费（类似于关注了微信公众号的人都能收到推送的文章）。
+
+补充：发布订阅模式下，当发布者消息量很大时，显然单个订阅者的处理能力是不足的。实际上现实场景中是多个订阅者节点组成一个订阅组负载均衡消费topic消息即分组订阅，这样订阅者很容易实现消费能力线性扩展。可以看成是一个topic下有多个Queue,每个Queue是点对点的方式，Queue之间是发布订阅方式。
 
 # Kafka
 
@@ -76,9 +85,11 @@ Apache Kafka由著名职业社交公司Linkedln开发，最初是被设计用来
 
 ## 介绍
 
-Kafka是一个分布式数据流平台，可以运行在单台服务器上，也可以在多台服务器上部署形成集群。它提供了发布和订阅功能，使用者可以**发送数据到Kafka中**，也可以**从Kafka中读取数据**（以便进行后续的处理）。Kafka具有高吞吐、低延迟、高容错等特点。
+==Kafka是一个**分布式**（集群）数据流（可以消费，也可以陈列）平台==，可以运行在单台服务器上，也可以在多台服务器上部署形成集群。它提供了发布和订阅功能，使用者可以**发送数据到Kafka中**，也可以**从Kafka中读取数据**（以便进行后续的处理）。Kafka具有高吞吐、低延迟、高容错等特点。
 
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403094603816.png" alt="image-20230403094603816" style="zoom:80%;" />
+
+生产者把消息丢到管道里，做分区后消费者拿出
 
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403094623766.png" alt="image-20230403094623766" style="zoom:80%;" />
 
@@ -88,9 +99,9 @@ Kafka是一个分布式数据流平台，可以运行在单台服务器上，也
 
   + Broker：Broker是指部署了Kafka实例的服务器节点。每个服务器上有一个或多个kafka的实列，我们姑且认为每个broker对应一台服务器。每个Kafka集群内的broker都有一个不重复的编号，如图中broker-0、broker-1等...
 
-  - ​		Topic：**消息的主题** ，可以理解为消息的分区，kafka的数据就保存在同批次。每个broker上都可以创建多个同批次。实际应用中通常是一个业务线建立一个topic
+  - ​		Topic：**消息的主题** ，什么类型的日志消息？可以理解为消息的分区，kafka的数据就保存在同批次。每个broker上都可以创建多个同批次。实际应用中通常是一个业务线建立一个topic
 
-  - ​		Partition：Topic的分区，每个topic可以有多个分区，分区的作用是做负载，提高kafka的吞吐量。同一个topic在不同的分区数据是不重复的，partition的表现形式就是一个一个的文件夹。
+  - ​		Partition：Topic的分区，每个topic可以有多个分区，分区的作用是做负载，提高kafka的吞吐量。同一个topic**在不同的分区数据是不重复**的，所有的相同的partition0的分区数据是一样的，partition的表现形式就是一个一个的文件夹。（partition0和partition1不一样）
 
   - ​		Replication：每个分区都有多个副本，副本的作用是做备胎。当主分区（Leader）故障的时候会选择一个（Follower）尚未，称为Leader。在kafka中默认副本的最大数量是10个，且副本的数量不能大于Broker的数量，follower和leader在不同的机器中，同一个机器对同一个分区只能存放一个副本（包括自己）
 
@@ -783,11 +794,23 @@ goroutine管理
 
 ​	1、选举
 
+在Raft协议中，每个节点都可以处于三种状态之一：follower、candidate和leader。所有节点在初始状态下都是follower，leader负责处理客户端的请求，follower和candidate负责将请求转发给leader。如果follower在一段时间内没有收到leader的消息，它会自动转变成candidate状态，向其他节点发送选举请求，并等待其他节点的投票，如果它获得了半数以上节点的投票，就会成为新的leader。如果在选举过程中出现了平票的情况，那么就进行多次投票，直到出现了胜者。
+
 ​	2、日志复制机制
+
+Raft协议采用的是日志复制模式，即leader向follower广播日志，follower接收并存储日志，并将日志复制到其他follower节点中。当leader节点宕机时，选举出新的leader节点，并通过复制日志来保证与原来的leader节点具有相同的状态
 
 ​	3、异常处理（脑裂）
 
-​	4、zookeeper的zad协议的区别
+在Raft协议中，由于网络问题或者节点宕机等原因，可能会导致脑裂的问题，即分布式系统中的不同节点之间彼此无法连接，形成两个不同的集群。在这种情况下，Raft采用“领导者复制”（Leader-based replication）的方式，即将集群中只有leader节点的集群视为合法状态，负责启动一个新的选举过程，重新选举出新的leader节点，保持分布式系统的正常运行。
+
+​	4、zookeeper的zab协议的区别
+
+Raft协议和Zookeeper的Zbab协议类似，都是解决分布式系统中的一致性问题的协议。但是它们之间有一些区别：
+
+- 选举方式不同：Zab协议使用了类Paxos算法的选举机制，而Raft协议使用了Term的概念，使得选举过程更加直观。
+- 数据同步机制不同：Zab协议采用的是两阶段提交机制，而Raft协议是leader向follower广播日志的方式。
+- 容错机制不同：Zab协议在主节点挂掉的时候，其他节点也无法工作，而Raft协议则可以在leader节点挂掉的情况下，自动进行选举。
 
 ![img](https://www.liwenzhou.com/images/Go/etcd/etcd_01.png)
 
@@ -948,3 +971,65 @@ localhost:2379
 ![image-20230406204100299](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406204100299.png)
 
 ![image-20230406204132009](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406204132009.png)
+
+## logagent根据etcd配置多个tailtask：
+
+
+
+![image-20230407111353739](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407111353739.png)
+
+![image-20230407112002092](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112002092.png)
+
+![image-20230407112142895](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112142895.png)
+
+![image-20230407112604419](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112604419.png)
+
+![image-20230407112622652](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112622652.png)
+
+
+
+删掉：
+
+![image-20230407112513717](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112513717.png)
+
+![image-20230407112708280](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112708280.png)
+
+![image-20230407112856173](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112856173.png)
+
+删掉 taillog里的Init函数
+
+将t *TailTask换掉
+
+![image-20230407113256006](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407113256006.png)
+
+readchan删掉
+
+![image-20230407113516717](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407113516717.png)
+
+![image-20230407113638888](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407113638888.png)
+
+![image-20230407114023817](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114023817.png)
+
+![image-20230407114139811](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114139811.png)
+
+![image-20230407114203102](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114203102.png)
+
+![image-20230407114423135](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114423135.png)
+
+![image-20230407114459150](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114459150.png)
+
+![image-20230407114540274](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114540274.png)
+
+![image-20230407114638150](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114638150.png)
+
+//真正往kafka发送日志的函数
+
+![image-20230407114759354](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114759354.png)
+
+![image-20230407114917769](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114917769.png)
+
+![image-20230407115024742](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407115024742.png)
+
+![image-20230407115044365](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407115044365.png)
+
+![image-20230407115058811](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407115058811.png)
