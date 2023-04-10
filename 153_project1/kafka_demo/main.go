@@ -13,10 +13,10 @@ func main() {
 	config.Producer.Return.Successes = true                   //成功交付的消息将在success channel返回
 	//构造一个消息
 	msg := &sarama.ProducerMessage{}
-	msg.Topic = "web_log"
+	msg.Topic = "web_log" //Topic名称
 	msg.Value = sarama.StringEncoder("this is a test log")
 	//连接kafka
-	client, err := sarama.NewSyncProducer([]string{"127.0.0.1:9092"}, config)
+	client, err := sarama.NewSyncProducer([]string{"127.0.0.1:9092"}, config) //使用给定的代理地址和配置config创建一个新的SyncProducer
 	if err != nil {
 		fmt.Println("producer closed,err:", err)
 		return
@@ -24,12 +24,13 @@ func main() {
 	fmt.Println("连接kafka成功")
 	defer client.Close()
 	//发送消息
-	pid, offset, err := client.SendMessage(msg)
+	pid, offset, err := client.SendMessage(msg) //SendMessage生成一个给定的消息，只有当它成功或失败地生成时才返回。
+	// 它将返回所生成消息的分区和偏移量，如果消息未能生成，则返回一个错误
 	fmt.Println("xxx")
 	if err != nil {
 		fmt.Println("send msg failed,err:", err)
 		return
 	}
-	fmt.Printf("pid:%v offset:%v\n", pid, offset)
+	fmt.Printf("pid:%v offset:%v\n", pid, offset) //分区和索引位置
 	fmt.Println("发送成功！")
 }

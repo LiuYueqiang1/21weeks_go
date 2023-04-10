@@ -112,7 +112,9 @@ Apache Kafka由著名职业社交公司Linkedln开发，最初是被设计用来
 
 ![image-20230403095351391](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403095351391.png)
 
-## 选择partition的原则
+把消息给leader，查看leader是谁
+
+## kafka选择partition的原则
 
 在kafka中，如果topic有多个partition，producer将数据发送到哪个partition中呢？
 
@@ -120,13 +122,17 @@ Apache Kafka由著名职业社交公司Linkedln开发，最初是被设计用来
 2. ==**hash**==：如果没有指定的partition，但是设置了数据的key，则会根据key的值hash出一个partition
 3. ==**轮询**==：如果既没有指定的partition，又没有设置key，则会用轮询方式，即每次取出一小段时间的数据写入某个partition，下一段的时间写入下一个partition
 
-## ACK应答机制
+## ACK应答机制（生产者往kafka发送数据的模式）
 
 producer在向kafka写入消息的时候，可以设置参数来确定是否确认kafka接收到数据
 
 - 0 代表producer往集群发送数据不需要等到集群的返回，不确保消息发送成功。安全性最低但是效率最高。
+
 - 1 代表producer往集群发送数据只要leader应答就可以发送下一条，只确保leader发送成功。
-- all 代表producer往集群发送数据需要所有的follower都完成从leader的同步才会发送下一条，确保leader发送成功和所有的副本都完成备份。安全性最高，但是效率最低。
+
+- all ：把数据发送给leader，确保follower从leader拉取数据回复ack给leader，leader再回复ack
+
+  代表producer往集群发送数据需要所有的follower都完成从leader的同步才会发送下一条，确保leader发送成功和所有的副本都完成备份。安全性最高，但是效率最低。
 
 注意：如果往不存在的topic里写数据，kafka会自动创建topic，partition和replication的数量默认配置都是1。
 
@@ -141,6 +147,8 @@ producer在向kafka写入消息的时候，可以设置参数来确定是否确�
 ![image-20230403102935219](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403102935219.png)
 
 ![image-20230403103048304](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403103048304.png)
+
+一个组内的两个消费者不能从同一个partition（P0-P3）获取数据。
 
 ![image-20230403103455941](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403103455941.png)
 
@@ -191,6 +199,8 @@ bin\windows\zookeeper-server-start.bat config\zookeeper.properties
 cd /d F:\kafka_2.13-3.4.0
 bin\windows\kafka-server-start.bat config\server.properties
 ```
+
+![image-20230410160904121](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230410160904121.png)
 
 ![image-20230403145322430](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230403145322430.png)
 
