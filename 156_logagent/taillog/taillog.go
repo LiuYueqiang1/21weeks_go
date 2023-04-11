@@ -18,7 +18,7 @@ func Init(fileName string) (err error) {
 		MustExist: false,                                //文件不存在不报错
 		Poll:      true,                                 //轮询文件更改
 	}
-	tailObj, err = tail.TailFile(fileName, config)
+	tailObj, err = tail.TailFile(fileName, config) //以配置项打开文件
 	if err != nil {
 		fmt.Println("tail file failed,err:", err)
 		return
@@ -26,7 +26,7 @@ func Init(fileName string) (err error) {
 	return
 }
 
-// 只读的单项通道
-func ReadChan() <-chan *tail.Line {
+// 只读的单项通道（只要通道里有值就读出来）
+func ReadChan() <-chan *tail.Line { //类型而已
 	return tailObj.Lines
 }

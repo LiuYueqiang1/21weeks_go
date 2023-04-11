@@ -35,7 +35,7 @@ func main() {
 	//	os.Exit(1)
 	//}
 
-	// 将配置文件加载出来映射到cfg对象里面
+	// 将配置文件加载出来映射到cfg对象里面，可以用ini文件做修改了
 	err := ini.MapTo(cfg, "./conf/config.ini")
 	if err != nil {
 		fmt.Printf("Fail to read file: %v", err)

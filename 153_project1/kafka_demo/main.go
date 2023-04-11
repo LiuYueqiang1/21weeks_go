@@ -5,8 +5,9 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-// 基于sarama第三方库开发的kafka client
+// 基于sarama第三方库开发的kafka client  读取
 func main() {
+	//配置信息
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll          //发送完整数据类型leader和follow都确认
 	config.Producer.Partitioner = sarama.NewRandomPartitioner //新选出一个partition
@@ -24,8 +25,8 @@ func main() {
 	fmt.Println("连接kafka成功")
 	defer client.Close()
 	//发送消息
-	pid, offset, err := client.SendMessage(msg) //SendMessage生成一个给定的消息，只有当它成功或失败地生成时才返回。
 	// 它将返回所生成消息的分区和偏移量，如果消息未能生成，则返回一个错误
+	pid, offset, err := client.SendMessage(msg) //SendMessage生成一个给定的消息，只有当它成功或失败地生成时才返回。
 	fmt.Println("xxx")
 	if err != nil {
 		fmt.Println("send msg failed,err:", err)

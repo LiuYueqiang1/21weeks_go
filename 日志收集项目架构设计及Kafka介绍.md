@@ -271,7 +271,7 @@ func main() {
 
 初始化go.mod
 
-```ba
+```bash
 SET GO111MODULE=on
 SET GOPROXY=http://goproxy.cn
 //go mod init
@@ -532,7 +532,7 @@ bin\windows\kafka-server-start.bat config\server.properties
 
 运行Goland
 
-用管理员方式运行cmd:
+用管理员方式运行cmd:程序已经发送到kafka中，下面就用kafka读取数据即可（kafka-终端-消费者）
 
 ```bash
 cd /d F:\kafka_2.13-3.4.0
@@ -780,7 +780,7 @@ goroutine管理
 
 缺点：部署的时候比较麻烦。每一个filebeat都需要配置一个配置文件。
 
-解决：使用etcd来管理被收集的日志项。
+解决：**使用etcd来管理被收集的日志项**。
 
 ### 项目架构：
 
@@ -822,13 +822,68 @@ Raft协议和Zookeeper的Zbab协议类似，都是解决分布式系统中的一
 - 数据同步机制不同：Zab协议采用的是两阶段提交机制，而Raft协议是leader向follower广播日志的方式。
 - 容错机制不同：Zab协议在主节点挂掉的时候，其他节点也无法工作，而Raft协议则可以在leader节点挂掉的情况下，自动进行选举。
 
+服务注册发现
+
 ![img](https://www.liwenzhou.com/images/Go/etcd/etcd_01.png)
+
+![image-20230411151750024](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230411151750024.png)
 
 etcd部署：[etcd部署 (qq.com)](https://docs.qq.com/doc/DTndrQXdXYUxUU09O)
 
+## 配置中心
+
+将一些配置信息放到etcd上进行集中管理
+
+这类场景的使用方式为：应用在启动的时候主动从etcd获取一次配置信息，同时，在etcd节点上注册一个watch并等待，以后每次配置有更新的时候，etcd都会实时通知订阅者，以此达到获取最新配置信息的目的。
+
+## 分布式锁
+
+因为 etcd 使用 Raft 算法保持了数据的强一致性，某次操作存储到集群中的值必然是全局一致的，所以很容易实现分布式锁。锁服务有两种使用方式，一是保持独占，二是控制时序。
+
+全班同学拿一瓶水
+
+- **保持独占即所有获取锁的用户==最终只有一个==可以得到**。etcd 为此提供了一套实现分布式锁原子操作 CAS（`CompareAndSwap`）的 API。通过设置`prevExist`值，可以保证在多个节点同时去创建某个目录时，只有一个成功。而创建成功的用户就可以认为是获得了锁。
+- ==控制时序==，即所有想要获得锁的用户都会被安排执行，但是**获得锁的顺序也是全局唯一的，同时决定了执行顺序**。etcd 为此也提供了一套 API（自动创建有序键），对一个目录建值时指定为`POST`动作，这样 etcd 会自动在目录下生成一个当前最大的值为键，存储这个新的值（客户端编号）。同时还可以使用 API 按顺序列出所有当前目录下的键值。此时这些键的值就是客户端的时序，而这些键中存储的值可以是代表客户端的编号。
+
+![img](https://www.liwenzhou.com/images/Go/etcd/etcd_02.png)
+
+## 为什么用 etcd 而不用ZooKeeper？
+
+etcd 实现的这些功能，ZooKeeper都能实现。那么为什么要用 etcd 而非直接使用ZooKeeper呢？
+
+### 为什么不选择ZooKeeper？
+
+1. 部署维护复杂，其使用的`Paxos`强一致性算法复杂难懂。官方只提供了`Java`和`C`两种语言的接口。
+2. 使用`Java`编写引入大量的依赖。运维人员维护起来比较麻烦。
+3. 最近几年发展缓慢，不如`etcd`和`consul`等后起之秀。
+
+### 为什么选择etcd？
+
+1. 简单。使用 Go 语言编写部署简单；支持HTTP/JSON API,使用简单；使用 Raft 算法保证强一致性让用户易于理解。
+2. etcd 默认数据一更新就进行持久化。
+3. etcd 支持 SSL 客户端安全认证。
+
+最后，etcd 作为一个年轻的项目，正在高速迭代和开发中，这既是一个优点，也是一个缺点。优点是它的未来具有无限的可能性，缺点是无法得到大项目长时间使用的检验。然而，目前 `CoreOS`、`Kubernetes`和`CloudFoundry`等知名项目均在生产环境中使用了`etcd`，所以总的来说，etcd值得你去尝试。
+
+![image-20230411152934148](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230411152934148.png)
+
+![image-20230411153044842](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230411153044842.png)
+
 ## put和get操作
 
-### 初始化
+### 终端执行：
+
+以管理员身份打开etcd.exe
+
+终端执行
+
+```cd /d F:\goland\go_project\etcd\etcd-v3.5.7-windows-amd64```
+
+```etcdctl.exe --endpoints=http://127.0.0.1:2379 put qikey "sh1"```
+
+```etcdctl.exe --endpoints=http://127.0.0.1:2379 get qikey```
+
+### go执行 初始化
 
 安装：```go get go.etcd.io/etcd/clientv3```
 
