@@ -25,6 +25,7 @@ func main() {
 	//defer cli.Close()
 	// put 创建一个键值
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	//从path下收集日志发送到topic
 	value := `[{"path":"c/temp/.log","topic":"web_log"},{"path":"d/xxx/redix.log","topic":"web_log"}]`
 	_, err = cli.Put(ctx, "/logagent/collect_config", value)
 	cancel()

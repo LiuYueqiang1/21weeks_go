@@ -6,6 +6,7 @@ import (
 	"kafka_etcd_new.com/kenew/conf"
 	"kafka_etcd_new.com/kenew/etcd"
 	"kafka_etcd_new.com/kenew/kafka"
+	"kafka_etcd_new.com/kenew/taillog"
 	"time"
 )
 
@@ -48,4 +49,10 @@ func main() {
 	for index, value := range logEntryConf {
 		fmt.Printf("index:%v  value:%v\n", index, value)
 	}
+	//[{"path":"c/temp/.log","topic":"web_log"},{"path":"d/xxx/redix.log","topic":"web_log"}]
+	//3、从path收集日志发往kafka的topic
+	//（每一个path对应一个tailObj）
+	//3、1循环每一个日志收集项，创建TailObj
+	taillog.Init(logEntryConf)
+	//3、2发往kafka
 }
