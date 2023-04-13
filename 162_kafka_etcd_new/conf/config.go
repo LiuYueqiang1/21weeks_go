@@ -5,8 +5,9 @@ type Sumconfig struct {
 	EtcdConf  `ini:"etcd"`
 }
 type KafkaConf struct {
-	Address string `ini:"address"`
-	Topic   string `ini:"topic"`
+	Address     string `ini:"address"`
+	Topic       string `ini:"topic"`
+	ChanMaxSize int    `int:"chan_max_size"`
 }
 
 type EtcdConf struct {

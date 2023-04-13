@@ -3,6 +3,7 @@ package taillog
 import (
 	"fmt"
 	"github.com/hpcloud/tail"
+	"kafka_etcd_new.com/kenew/kafka"
 )
 
 // TailTask 一个日志收集的任务
@@ -42,6 +43,7 @@ func (t *TailTask) run() {
 		case line := <-t.instance.Lines:
 			//kafka.SendToKafka(t.topic, line.Text) //函数调用函数（修改：放到通道里即可）
 			//先把日志数据发送到一个通道中
+			kafka.SendToChan(t.topic, line.Text)
 			//kafka那个包中有单独的goroutine去收集日志数据发送到kafka
 		}
 	}
