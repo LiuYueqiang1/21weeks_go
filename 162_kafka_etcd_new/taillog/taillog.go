@@ -1,6 +1,7 @@
 package taillog
 
 import (
+	"context"
 	"fmt"
 	"github.com/hpcloud/tail"
 	"kafka_etcd_new.com/kenew/kafka"
@@ -11,12 +12,18 @@ type TailTask struct {
 	path     string
 	topic    string
 	instance *tail.Tail
+	//为了能实现退出t.run()
+	ctx        context.Context
+	cancelFunc context.CancelFunc
 }
 
 func NewTailTask(path, topic string) (tailObj *TailTask) {
+	ctx, cancel := context.WithCancel(context.Background())
 	tailObj = &TailTask{
-		path:  path,
-		topic: topic,
+		path:       path,
+		topic:      topic,
+		ctx:        ctx,
+		cancelFunc: cancel,
 	}
 	tailObj.init()
 	return
@@ -35,11 +42,15 @@ func (t *TailTask) init() {
 		fmt.Println("tail file failed,err:", err)
 		return
 	}
+	//当goroutine执行的函数推出的时候，goroutine就结束了
 	go t.run() //直接去采集日志发送到kafka
 }
 func (t *TailTask) run() {
 	for {
 		select {
+		case <-t.ctx.Done():
+			fmt.Printf("tail task:%s_%s 结束了...\n", t.path, t.topic)
+			return
 		case line := <-t.instance.Lines:
 			//kafka.SendToKafka(t.topic, line.Text) //函数调用函数（修改：放到通道里即可）
 			//先把日志数据发送到一个通道中
