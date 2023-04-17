@@ -822,6 +822,10 @@ Raft协议和Zookeeper的Zbab协议类似，都是解决分布式系统中的一
 - 数据同步机制不同：Zab协议采用的是两阶段提交机制，而Raft协议是leader向follower广播日志的方式。
 - 容错机制不同：Zab协议在主节点挂掉的时候，其他节点也无法工作，而Raft协议则可以在leader节点挂掉的情况下，自动进行选举。
 
+watch底层实现的原理
+
+
+
 服务注册发现
 
 ![img](https://www.liwenzhou.com/images/Go/etcd/etcd_01.png)
@@ -1098,3 +1102,115 @@ readchan删掉
 ![image-20230407115044365](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407115044365.png)
 
 ![image-20230407115058811](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407115058811.png)
+
+Logagent：把文件从日志中读取出来发送到kafka
+
+Logtransfer：从kafka把日志取出来写入ES，使用Kibana做可视化展示
+
+系统监控：gopsutil做系统监控信息的采集，写入influxDB，使用grafana作展示
+
+prometheus监控：采集性能呢指标数据，保存起来，使用grafnan作展示
+
+# LogTransfer
+
+## ES(Elastic search)
+
+ ES搭建指南：docs.qq.com/doc/DTmZxQUdHeFRXU2dP
+
+下载
+
+```bin\elasticsearch.bat```
+
+## Kibana
+
+下载
+
+切换不同版本的JDK：[(50条消息) Win10同时安装使用Java JDK8和11两个版本如何设置环境变量_Yeoh1999的博客-CSDN博客](https://blog.csdn.net/Yeoh1999/article/details/108248254)
+
+jdk1.8适用于 ES7.6.1
+
+jdk20适用于ES8.7.0，但是似乎不稳定
+
+Postman：
+
+执行go程序，然后获得index和type。打开postman
+
+GET      127.0.0.1:9200/user/_doc/_search
+
+# Kafka消费
+
+根据topic找到分区
+
+根据每一个分区去消费数据
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/Shopify/sarama"
+)
+
+// kafka consumer
+
+func main() {
+	consumer, err := sarama.NewConsumer([]string{"127.0.0.1:9092"}, nil)
+	if err != nil {
+		fmt.Printf("fail to start consumer, err:%v\n", err)
+		return
+	}
+	partitionList, err := consumer.Partitions("web_log") // 根据topic取到所有的分区
+	if err != nil {
+		fmt.Printf("fail to get list of partition:err%v\n", err)
+		return
+	}
+	fmt.Println(partitionList)
+	for partition := range partitionList { // 遍历所有的分区
+		// 针对每个分区创建一个对应的分区消费者
+		pc, err := consumer.ConsumePartition("web_log", int32(partition), sarama.OffsetNewest)
+		if err != nil {
+			fmt.Printf("failed to start consumer for partition %d,err:%v\n", partition, err)
+			return
+		}
+		defer pc.AsyncClose()
+		// 异步从每个分区消费信息
+		go func(sarama.PartitionConsumer) {
+			for msg := range pc.Messages() {
+				fmt.Printf("Partition:%d Offset:%d Key:%v Value:%v", msg.Partition, msg.Offset, msg.Key, msg.Value)
+			}
+		}(pc)
+	}
+}
+```
+
+# LogTaranfer实现
+
+# 项目总结
+
+项目名称改一下：服务端agent开发
+
+1、项目架构（图）
+
+2、监控可以不说
+
+3、为什么不用ELK
+
+4、logAgent里面如何保证日志不丢/重启之后继续收集日志（记录读取文件的offset）
+
+5、kafka课上整理的点
+
+6、etcd的watch原理
+
+7、es相关知识点（搜索引擎的底层如何实现的）
+
+
+
+找工作：
+
+1、找开发的算法和数据结构
+
+2、运维会前端
+
+3、Boss直聘花钱
+

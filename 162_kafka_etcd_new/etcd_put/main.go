@@ -26,7 +26,7 @@ func main() {
 	// put 创建一个键值
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	//从path下收集日志发送到topic
-	value := `[{"path":"D/temp/.log","topic":"web_log"},{"path":"D/xxx/redix.log","topic":"web_log"}]`
+	value := `[{"path":"D:\temp\1.log","topic":"web_log"},{"path":"D:\xxx\redix.log","topic":"web_log"}]`
 	_, err = cli.Put(ctx, "/logagent/collect_config", value)
 	cancel()
 	fmt.Println("put to etcd success!")
