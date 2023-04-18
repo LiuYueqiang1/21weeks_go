@@ -6,6 +6,7 @@ import (
 )
 
 // 基于sarama第三方库开发的kafka client  读取
+// 将读取到的日志发送到kafka中
 func main() {
 	//配置信息
 	config := sarama.NewConfig()
@@ -27,7 +28,6 @@ func main() {
 	//发送消息
 	// 它将返回所生成消息的分区和偏移量，如果消息未能生成，则返回一个错误
 	pid, offset, err := client.SendMessage(msg) //SendMessage生成一个给定的消息，只有当它成功或失败地生成时才返回。
-	fmt.Println("xxx")
 	if err != nil {
 		fmt.Println("send msg failed,err:", err)
 		return

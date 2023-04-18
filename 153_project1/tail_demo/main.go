@@ -8,7 +8,7 @@ import (
 
 // tail 读日志
 func main() {
-	fileName := "./my.log"
+	fileName := "F:\\goland\\go_project\\21weeks\\21weeks_go\\153_project1\\my.log"
 	config := tail.Config{
 		ReOpen:    true,                                 //重新打开（日志大小超出范围，重新打开）
 		Follow:    true,                                 //是否跟随（继续读之前未读完的文件）
