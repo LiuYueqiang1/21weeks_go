@@ -124,7 +124,7 @@ Apache Kafka由著名职业社交公司Linkedln开发，最初是被设计用来
 
 ## ACK应答机制（生产者往kafka发送数据的模式）
 
-producer在向kafka写入消息的时候，可以设置参数来确定是否确认kafka接收到数据
+producer在向kafka 写入消息的时候，可以设置参数来确定是否确认kafka接收到数据
 
 - 0 代表producer往集群发送数据不需要等到集群的返回，不确保消息发送成功。安全性最低但是效率最高。
 
@@ -796,7 +796,7 @@ goroutine管理
 
 ## 基本
 
-使用etcd优化日志收集项目
+使用etcd==优化==日志收集项目
 
 协议：
 
@@ -1015,93 +1015,9 @@ url改为：
 localhost:2379
 ```
 
-从etcd中获取日志收集项的配置信息
-
-![image-20230406202431844](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406202431844.png)
-
-将key value反序列化到json里面
-
-![image-20230406202548250](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406202548250.png)
+# 从etcd中获取日志收集项的配置信息
 
 
-
-   ![image-20230406202750266](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406202750266.png)
-
-![image-20230406202934173](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406202934173.png)
-
-新建一个etcd_put
-
-![image-20230406203032394](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406203032394.png)
-
-<img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406203954240.png" alt="image-20230406203954240" style="zoom:150%;" />
-
-![image-20230406204015480](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406204015480.png)
-
-![image-20230406204100299](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406204100299.png)
-
-![image-20230406204132009](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230406204132009.png)
-
-## logagent根据etcd配置多个tailtask：
-
-
-
-![image-20230407111353739](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407111353739.png)
-
-![image-20230407112002092](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112002092.png)
-
-![image-20230407112142895](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112142895.png)
-
-![image-20230407112604419](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112604419.png)
-
-![image-20230407112622652](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112622652.png)
-
-
-
-删掉：
-
-![image-20230407112513717](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112513717.png)
-
-![image-20230407112708280](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112708280.png)
-
-![image-20230407112856173](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407112856173.png)
-
-删掉 taillog里的Init函数
-
-将t *TailTask换掉
-
-![image-20230407113256006](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407113256006.png)
-
-readchan删掉
-
-![image-20230407113516717](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407113516717.png)
-
-![image-20230407113638888](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407113638888.png)
-
-![image-20230407114023817](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114023817.png)
-
-![image-20230407114139811](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114139811.png)
-
-![image-20230407114203102](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114203102.png)
-
-![image-20230407114423135](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114423135.png)
-
-![image-20230407114459150](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114459150.png)
-
-![image-20230407114540274](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114540274.png)
-
-![image-20230407114638150](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114638150.png)
-
-//真正往kafka发送日志的函数
-
-![image-20230407114759354](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114759354.png)
-
-![image-20230407114917769](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407114917769.png)
-
-![image-20230407115024742](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407115024742.png)
-
-![image-20230407115044365](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407115044365.png)
-
-![image-20230407115058811](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230407115058811.png)
 
 Logagent：把文件从日志中读取出来发送到kafka
 

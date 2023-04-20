@@ -40,6 +40,7 @@ func main() {
 	}
 	fmt.Println("init etcd success")
 
+	//初始化etcd后不用tail包从文件中读了，而是从etcd里拉取
 	// 为了实现每个logagent都拉去自己独有的配置，所以要自己的IP地址作为区分
 	ipStr, err := utils.GetOutboundIP()
 	if err != nil {
@@ -59,6 +60,7 @@ func main() {
 	for index, value := range logEntryConf {
 		fmt.Printf("index:%v  value:%v\n", index, value)
 	}
+	//读文件 发往kafka的topic
 	//[{"path":"c/temp/.log","topic":"web_log"},{"path":"d/xxx/redix.log","topic":"web_log"}]
 	//3、从path收集日志发往kafka的topic
 	//（每一个path对应一个tailObj）

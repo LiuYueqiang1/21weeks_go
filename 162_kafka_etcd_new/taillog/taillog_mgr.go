@@ -6,12 +6,13 @@ import (
 	"time"
 )
 
+// 165
 var tskMgr *tailLogMgr
 
 // 有很多taillog对象，管理taillog对象的，每一个对应着一个path，打开一个文件，对应一个tailObj
 type tailLogMgr struct {
-	logEntry    []*etcd.LogEntry
-	tskMap      map[string]*TailTask
+	logEntry    []*etcd.LogEntry     //是否修改
+	tskMap      map[string]*TailTask //有多少个tailtask记下来
 	newConfChan chan []*etcd.LogEntry
 }
 

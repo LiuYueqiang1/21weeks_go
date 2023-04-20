@@ -33,7 +33,7 @@ func Init(addrs []string, maxSize int) (err error) {
 	//初始化logDataChan
 	logDataChan = make(chan *logDate, maxSize)
 	//开启后台goroutine从通道中取数据发往kafka
-	go SendToKafka()
+	go sendToKafka()
 	return
 }
 
@@ -46,8 +46,8 @@ func SendToChan(topic, data string) {
 	logDataChan <- msg
 }
 
-// 往kafka发送日志的函数
-func SendToKafka() {
+// 真正往kafka发送日志的函数
+func sendToKafka() {
 	for {
 		select {
 		case ld := <-logDataChan:

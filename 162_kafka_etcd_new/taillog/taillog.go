@@ -9,8 +9,8 @@ import (
 
 // TailTask 一个日志收集的任务
 type TailTask struct {
-	path     string
-	topic    string
+	path     string //收集哪个路径的日志
+	topic    string //收集的日志保存到kafka下的哪个topic
 	instance *tail.Tail
 	//为了能实现退出t.run()
 	ctx        context.Context

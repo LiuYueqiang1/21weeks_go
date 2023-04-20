@@ -22,7 +22,7 @@ func main() {
 		fmt.Printf("marshal failed,err:%v", err)
 		return
 	}
-	fmt.Printf("%v\n", string(b))
+	fmt.Printf("%v\n", string(b)) //{"name":"州立","age":20}
 	//{"name":"州立","age":20}     用的JSON格式
 	//{"Name":"州立","Age":20}	  未用JSON格式
 
