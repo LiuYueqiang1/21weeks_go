@@ -48,7 +48,7 @@ func (t *TailTask) init() {
 func (t *TailTask) run() {
 	for {
 		select {
-		case <-t.ctx.Done():
+		case <-t.ctx.Done(): //当执行这个的时候 contex.cancel的时候则退出
 			fmt.Printf("tail task:%s_%s 结束了...\n", t.path, t.topic)
 			return
 		case line := <-t.instance.Lines:

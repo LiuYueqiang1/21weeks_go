@@ -44,7 +44,7 @@ func (t *tailLogMgr) run() {
 		case newConf := <-t.newConfChan:
 			for _, conf := range newConf {
 				mk := fmt.Sprintf("%s_%s", conf.Path, conf.Topic)
-				_, ok := t.tskMap[conf.Path]
+				_, ok := t.tskMap[mk]
 				if ok {
 					//原来就有，不需要操作
 					continue
@@ -57,7 +57,7 @@ func (t *tailLogMgr) run() {
 			for _, c1 := range t.logEntry { // 从原来的
 				isDelete := true
 				for _, c2 := range newConf { //去新的配置中逐一进行比较
-					if c2.Path == c1.Path && c2.Topic == c1.Topic {
+					if c2.Path == c1.Path && c2.Topic == c1.Topic { //原来有现在也有，什么都不做
 						isDelete = false
 						continue
 					}

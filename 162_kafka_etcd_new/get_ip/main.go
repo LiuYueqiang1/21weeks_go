@@ -1,4 +1,4 @@
-package get_ip
+package main
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 
 // GetOutboundIP 获取本地对外IP
 func GetOutboundIP() (ip string, err error) {
-	conn, err := net.Dial("upd", "8.8.8.8:80")
+	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
 		return
 	}

@@ -56,7 +56,6 @@ func main() {
 	}
 	fmt.Printf("get conf from etcd success,%v\n", logEntryConf)
 	//2、2拍一个哨兵去监视日志收集项的变化（有变化及时通知我的logAgent实现加载配置）
-
 	for index, value := range logEntryConf {
 		fmt.Printf("index:%v  value:%v\n", index, value)
 	}
@@ -65,7 +64,7 @@ func main() {
 	//3、从path收集日志发往kafka的topic
 	//（每一个path对应一个tailObj）
 	//3、1循环每一个日志收集项，创建TailObj
-	taillog.Init(logEntryConf) //因为NewConfChan访问ltskMgr的newConfChan，
+	taillog.Init(logEntryConf) //因为NewConfChan访问了tskMgr的newConfChan，
 	//这个channnel是在taillog.Init(logEntryConf)执行的初始化
 	newConfChan := taillog.NewConfChan() //从taillog包中获取对外暴露的通道
 	var wg sync.WaitGroup

@@ -824,6 +824,12 @@ Raft协议和Zookeeper的Zbab协议类似，都是解决分布式系统中的一
 
 watch底层实现的原理
 
+回答为什么不用ELK？
+
+etcd的watch 
+
+etcd的底层如何实现watch给客户发通知websocket
+
 
 
 服务注册发现
@@ -1016,6 +1022,41 @@ localhost:2379
 ```
 
 # 从etcd中获取日志收集项的配置信息
+
+
+
+用管理员启用cmd：
+
+```bash
+cd /d F:\kafka_2.13-3.4.0
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+```
+
+```bash
+cd /d F:\kafka_2.13-3.4.0
+bin\windows\kafka-server-start.bat config\server.properties
+```
+
+
+
+双击**etcd.exe**就是启动了etcd。其他平台解压之后在bin目录下找etcd可执行文件。
+
+默认会在2379端口监听客户端通信，在2380端口监听节点间通信。
+
+**etcdctl.exe**可以理解为一个客户端或本机etcd的控制端。
+
+运行Goland
+
+用管理员方式运行cmd:程序已经发送到kafka中，下面就用kafka读取数据即可（kafka-终端-消费者）
+
+```bash
+cd /d F:\kafka_2.13-3.4.0
+bin\windows\kafka-console-consumer.bat --bootstrap-server=127.0.0.1:9092 --topic=web_log --from-beginning
+```
+
+打开文件my.log输入内容，在cmd中显示
+
+
 
 
 
