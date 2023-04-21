@@ -2,12 +2,16 @@ package conf
 
 type SumConf struct {
 	KafkaConf `ini:"kafka"`
-	TailConf  `ini:"taillog"`
+	EtcdConf  `ini:"etcd"`
 }
 type KafkaConf struct {
 	Address string `ini:"address"`
-	Topic   string `ini:"topic"`
 }
+type EtcdConf struct {
+	Address string `ini:"address"`
+}
+
+// -----------
 type TailConf struct {
 	Filename string `ini:"filename"`
 }

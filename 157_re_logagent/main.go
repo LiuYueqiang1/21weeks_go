@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"gopkg.in/ini.v1"
 	"review.com/logagent/conf"
+	"review.com/logagent/etcd"
 	"review.com/logagent/kafka"
-	"review.com/logagent/tail"
-	"time"
 )
 
 var cfg = new(conf.SumConf)
@@ -27,23 +26,37 @@ func main() {
 		return
 	}
 	fmt.Println("init kafka success!")
-	//2、打开文件收集日志
-	err = tail.Init(cfg.TailConf.Filename)
+	//2、初始化etcd
+	err = etcd.Init(cfg.EtcdConf.Address)
 	if err != nil {
-		fmt.Println("init taillog failed!,err:", err)
+		fmt.Println("init etcd failed,err:", err)
+		return
 	}
-	//3、开始业务，发送到kafka中
-	fmt.Println("init taillog success")
-	run()
-}
-func run() {
-	for {
-		select {
-		case line := <-tail.ReadChan():
-			kafka.SendTokafka(cfg.KafkaConf.Topic, line.Text)
-		//2、发送到kafka
-		default:
-			time.Sleep(time.Second)
-		}
+	fmt.Println("init etcd success!")
+	//2、获取配置信息
+	LogEntryConf, err := etcd.GetConf("/xxx")
+	fmt.Printf("get conf from etcd success,%v\n", LogEntryConf)
+	for index, value := range LogEntryConf {
+		fmt.Printf("index:%v value:%v\n", index, value)
 	}
+	////2、打开文件收集日志
+	//err = tail.Init(cfg.TailConf.Filename)
+	//if err != nil {
+	//	fmt.Println("init taillog failed!,err:", err)
+	//}
+	////3、开始业务，发送到kafka中
+	//fmt.Println("init taillog success")
+	//run()
 }
+
+//func run() {
+//	for {
+//		select {
+//		case line := <-tail.ReadChan():
+//			kafka.SendTokafka(cfg.KafkaConf.Topic, line.Text)
+//		//2、发送到kafka
+//		default:
+//			time.Sleep(time.Second)
+//		}
+//	}
+//}
