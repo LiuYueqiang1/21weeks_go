@@ -1023,6 +1023,281 @@ localhost:2379
 
 # 从etcd中获取日志收集项的配置信息
 
+## 代码
+
+这个代码主要是用etcd.put和etcd.get收集配置信息（文件名、topic）
+
+将filename、topic收集put到etcd.value里面，并用etcd.key索引，etcd.key是固定的，都是/xxx
+
+用json.Unmarshal将filename和topic反序列化到LogEntry结构体中，可以一一进行对应
+
+### ```etcd.go```
+
+```go
+package etcd
+
+import (
+   "context"
+   "encoding/json"
+   "fmt"
+   "go.etcd.io/etcd/clientv3"
+   "time"
+)
+
+var cli *clientv3.Client
+
+type LogEntry struct {
+   Path  string `json:"path"`
+   Topic string `json:"topic"`
+}
+
+func Init(addr string) (err error) {
+
+   // 创建etcd客户端
+   cli, err = clientv3.New(clientv3.Config{ //配置文件
+      //节点
+      Endpoints: []string{addr},
+      //5s钟都连不上就超时了
+      DialTimeout: 5 * time.Second,
+   })
+   if err != nil {
+      // handle error!
+      fmt.Printf("connect to etcd failed, err:%v\n", err)
+      return
+   }
+   fmt.Println("connect to etcd success")
+   //defer cli.Close()
+   return
+}
+func GetConf(key string) (LogEneryConf []*LogEntry, err error) {
+
+   // get 获取一个键的值
+   ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+   resp, err := cli.Get(ctx, key)
+   cancel()
+   if err != nil {
+      fmt.Printf("get from etcd failed, err:%v\n", err)
+      return
+   }
+   //Kvs多个键值对，一个个遍历出来
+   for _, ev := range resp.Kvs {
+      err = json.Unmarshal(ev.Value, &LogEneryConf)
+      if err != nil {
+         fmt.Println("unmarshal is failed,err:", err)
+         return
+      }
+      //fmt.Printf("%s:%s\n", ev.Key, ev.Value)
+   }
+   return
+}
+```
+
+### ```etcd_put```
+
+```go
+package main
+
+import (
+   "context"
+   "fmt"
+   "go.etcd.io/etcd/clientv3"
+   "time"
+)
+
+func main() {
+   //导入的包，v3表示版本
+   // 创建etcd客户端
+   cli, err := clientv3.New(clientv3.Config{ //配置文件
+      //节点
+      Endpoints: []string{"localhost:2379"},
+      //5s钟都连不上就超时了
+      DialTimeout: 5 * time.Second,
+   })
+   if err != nil {
+      // handle error!
+      fmt.Printf("connect to etcd failed, err:%v\n", err)
+      return
+   }
+   fmt.Println("connect to etcd success")
+   defer cli.Close()
+   // put 创建一个键值
+   ctx, cancel := context.WithTimeout(context.Background(), time.Second) //一秒钟连不上则取消
+   value := `[
+    {
+        "path":"F:/utemp/utest1.log",
+        "topic":"web_log"
+    },
+    {
+        "path":"F:/utemp/utest2.log",
+        "topic":"web_log"
+    }
+]`
+   _, err = cli.Put(ctx, "/xxx", value)
+   cancel()
+   if err != nil {
+      fmt.Printf("put to etcd failed, err:%v\n", err)
+      return
+   }
+}
+```
+
+### ```main.go```
+
+```go
+package main
+
+import (
+   "fmt"
+   "gopkg.in/ini.v1"
+   "review.com/logagent/conf"
+   "review.com/logagent/etcd"
+   "review.com/logagent/kafka"
+)
+
+var cfg = new(conf.SumConf)
+
+func main() {
+   //0.加载配置文件
+   // 将配置文件加载出来映射到cfg对象里面
+   err := ini.MapTo(cfg, "F:\\goland\\go_project\\21weeks\\21weeks_go\\157_re_logagent\\conf\\conf.ini")
+   if err != nil {
+      fmt.Printf("Fail to read file: %v", err)
+      return
+   }
+   //fmt.Println(cfg.KafkaConf.Address)
+   //1、初始化kafka连接
+   err = kafka.Init([]string{cfg.KafkaConf.Address})
+   if err != nil {
+      fmt.Println("init kafka failed,err:", err)
+      return
+   }
+   fmt.Println("init kafka success!")
+   //2、初始化etcd
+   err = etcd.Init(cfg.EtcdConf.Address)
+   if err != nil {
+      fmt.Println("init etcd failed,err:", err)
+      return
+   }
+   fmt.Println("init etcd success!")
+   //2、获取配置信息
+   LogEntryConf, err := etcd.GetConf("/xxx")
+   fmt.Printf("get conf from etcd success,%v\n", LogEntryConf)
+   for index, value := range LogEntryConf {
+      fmt.Printf("index:%v value:%v\n", index, value)
+   }
+}
+
+```
+
+### ```conf.go```
+
+```go
+package conf
+
+type SumConf struct {
+   KafkaConf `ini:"kafka"`
+   EtcdConf  `ini:"etcd"`
+}
+type KafkaConf struct {
+   Address string `ini:"address"`
+}
+type EtcdConf struct {
+   Address string `ini:"address"`
+}
+```
+
+### conf.ini
+
+```go
+[kafka]
+address=127.0.0.1:9092
+topic=web_log
+
+[etcd]
+address=localhost:2379
+```
+
+### ```kafka.go```
+
+```go
+package kafka
+
+import (
+   "fmt"
+   "github.com/Shopify/sarama"
+)
+
+var client sarama.SyncProducer
+
+func Init(addr []string) (err error) {
+   config := sarama.NewConfig()
+   config.Producer.RequiredAcks = sarama.WaitForAll          // 发送完数据需要leader和follow都确认
+   config.Producer.Partitioner = sarama.NewRandomPartitioner // 新选出一个partition
+   config.Producer.Return.Successes = true                   // 成功交付的消息将在success channel返回
+   // 连接kafka
+   client, err = sarama.NewSyncProducer(addr, config)
+   if err != nil {
+      fmt.Println("producer closed, err:", err)
+      return
+   }
+   //defer client.Close()
+   return
+}
+func SendTokafka(topic, data string) {
+   // 构造一个消息
+   msg := &sarama.ProducerMessage{}
+   msg.Topic = topic
+   msg.Value = sarama.StringEncoder(data)
+   // 发送消息
+   pid, offset, err := client.SendMessage(msg)
+   fmt.Println("xxx")
+   if err != nil {
+      fmt.Println("send msg failed, err:", err)
+      return
+   }
+   fmt.Printf("pid:%v offset:%v\n", pid, offset)
+   fmt.Println("发送到kafka成功！")
+}
+```
+
+### ```taillog.go```
+
+```go
+package tail
+
+import (
+   "fmt"
+   "github.com/hpcloud/tail"
+)
+
+var (
+   tailObj *tail.Tail
+   LogChan chan string
+)
+
+func Init(fileName string) (err error) {
+   config := tail.Config{
+      ReOpen:    true,                                 //重新打开（日志大小超出范围，重新打开）
+      Follow:    true,                                 //是否跟随（继续读之前未读完的文件）
+      Location:  &tail.SeekInfo{Offset: 0, Whence: 2}, //从文件的哪个地方开始读
+      MustExist: false,                                //文件不存在报错
+      Poll:      true,                                 //轮询文件更改
+   }
+   //fileName := "F:\\goland\\go_project\\21weeks\\21weeks_go\\157_re_logagent\\157my.log"
+   tailObj, err = tail.TailFile(fileName, config) //用config配置项打开文件
+   if err != nil {
+      fmt.Println("tail file failed,err:", err)
+      return
+   }
+   return
+}
+func ReadChan() <-chan *tail.Line {
+   return tailObj.Lines
+}
+```
+
+## 运行
+
 
 
 用管理员启用cmd：
@@ -1044,6 +1319,14 @@ bin\windows\kafka-server-start.bat config\server.properties
 默认会在2379端口监听客户端通信，在2380端口监听节点间通信。
 
 **etcdctl.exe**可以理解为一个客户端或本机etcd的控制端。
+
+以管理员身份打开etcd.exe
+
+终端执行
+
+```cd /d F:\goland\go_project\etcd\etcd-v3.5.7-windows-amd64```
+
+```etcdctl.exe --endpoints=http://127.0.0.1:2379 get /xxx```
 
 运行Goland
 
