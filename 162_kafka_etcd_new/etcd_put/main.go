@@ -26,8 +26,8 @@ func main() {
 	// put 创建一个键值
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	//从path下收集日志发送到topic
-	value := `[{"path":"F:\goland\go_project\21weeks\21weeks_go\162_kafka_etcd_new\mysql.log","topic":"web_log"},{"path":"F:\goland\go_project\21weeks\21weeks_go\162_kafka_etcd_new\redix.log","topic":"web_log"}]`
-	_, err = cli.Put(ctx, "/logagent/172.20.10.11/collect_config", value)
+	value := `[{"path":"F:/goland/go_project/21weeks/21weeks_go/162_kafka_etcd_new/mysql.log","topic":"web_log"},{"path":"F:/goland/go_project/21weeks/21weeks_go/162_kafka_etcd_new/redix.log","topic":"web_log"}]`
+	_, err = cli.Put(ctx, "/logagent/collect_config/172.20.10.11/collect_config", value)
 	cancel()
 	fmt.Println("put to etcd success!")
 	if err != nil {

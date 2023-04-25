@@ -1339,9 +1339,50 @@ bin\windows\kafka-console-consumer.bat --bootstrap-server=127.0.0.1:9092 --topic
 
 打开文件my.log输入内容，在cmd中显示
 
+## logagent根据etcd的配置创建多个tailtask
 
+将key添加到配置文件中。修改
 
+收集日志发往kafka
 
+循环每一个日志收集项，创建tailobj
+
+发往kafka
+
+```go
+`[
+    {
+        "path":"F:/utemp/utest1.log",
+        "topic":"web_log"
+    },
+    {
+        "path":"F:/utemp/utest2.log",
+        "topic":"web_log"
+    }
+]`
+```
+
+这两个路径分别对应两个tailObj对象
+
+```
+func Init(logEntryConf []*etcd.LogEntry) {
+   tskMgr = &tailLogMgr{
+      logEntry:    logEntryConf, //把当前的日志收集项保存起来
+      tskMap:      make(map[string]*TailTask, 16),
+      newConfChan: make(chan []*etcd.LogEntry), //无缓冲区的通道
+   }
+   for _, logEntry := range logEntryConf {
+      //conf: *etcd.LogEntry
+      //logEntry.Path
+      //初始化的时候起了多少个tailtask 都要记下来，为了后续判断方便
+      tailtask := NewTailTask(logEntry.Path, logEntry.Topic)
+      mk := fmt.Sprintf("%s_%s", logEntry.Path, logEntry.Topic)
+      tskMgr.tskMap[mk] = tailtask
+
+   }
+   go tskMgr.run()
+}
+```
 
 Logagent：把文件从日志中读取出来发送到kafka
 
@@ -1350,6 +1391,26 @@ Logtransfer：从kafka把日志取出来写入ES，使用Kibana做可视化展�
 系统监控：gopsutil做系统监控信息的采集，写入influxDB，使用grafana作展示
 
 prometheus监控：采集性能呢指标数据，保存起来，使用grafnan作展示
+
+166 logagent实现watch配置更新
+
+1、原来有三个配置项又新增了一个配置项
+
+2、原来有现在没有
+
+3、修改，有关的有开的
+
+etcd建立一个watch监控配置文件
+
+通知TailTask
+
+监听自己的newConfChan，有了新配置过来之后做对应的处理
+
+传递给用到配置的地方
+
+taillog.Init
+
+
 
 # LogTransfer
 
